@@ -1,25 +1,21 @@
-// functions/index.js
-
 const express = require('express');
 const cors = require('cors');
 const mercadopago = require('mercadopago');
 const path = require('path');
-
 require('dotenv').config();
 
 const app = express();
+
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
 
-// Configura MercadoPago con el token del .env
-const mp = new mercadopago.MercadoPagoConfig({
-  accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN
+// Configurar MercadoPago con token desde .env
+mercadopago.configure({
+  access_token: process.env.MERCADOPAGO_ACCESS_TOKEN
 });
 
-const preferenceClient = new mercadopago.Preference(mp);
-
-// Ruta para crear preferencia de pago
+// Ruta vieja (si la usás desde algún HTML del frontend)
 app.post('/create_preference', async (req, res) => {
   try {
     const { title, unit_price, quantity } = req.body;
@@ -33,23 +29,51 @@ app.post('/create_preference', async (req, res) => {
         },
       ],
       back_urls: {
-        success: 'https://francisfotografia.onrender.com/success.html',
-        failure: 'https://francisfotografia.onrender.com/failure.html',
-        pending: 'https://francisfotografia.onrender.com/pending.html',
+        success: 'https://francislaboratoriofotografico.onrender.com/success.html',
+        failure: 'https://francislaboratoriofotografico.onrender.com/failure.html',
+        pending: 'https://francislaboratoriofotografico.onrender.com/pending.html',
       },
       auto_return: 'approved',
     };
 
-    const response = await preferenceClient.create({ body: preference });
-    res.json({ id: response.id });
+    const response = await mercadopago.preferences.create(preference);
+    res.json({ id: response.body.id });
   } catch (error) {
-    console.error('Error creando preferencia:', error);
+    console.error('Error en /create_preference:', error);
     res.status(500).json({ error: 'Error al crear preferencia' });
   }
 });
 
-// Inicia el servidor
+// Ruta nueva para Render
+app.post('/createPreferenceHttp', async (req, res) => {
+  try {
+    const { total, paymentType } = req.body;
+
+    const preference = {
+      items: [
+        {
+          title: 'Compra en Francis Color',
+          unit_price: Number(total),
+          quantity: 1,
+        },
+      ],
+      back_urls: {
+        success: 'https://francislaboratoriofotografico.onrender.com/completarcompra.html?success=true',
+        failure: 'https://francislaboratoriofotografico.onrender.com/completarcompra.html?success=false',
+      },
+      auto_return: 'approved',
+    };
+
+    const response = await mercadopago.preferences.create(preference);
+    res.json({ init_point: response.body.init_point });
+  } catch (err) {
+    console.error('Error en /createPreferenceHttp:', err);
+    res.status(500).json({ error: 'Error al crear preferencia' });
+  }
+});
+
+// Iniciar el servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
+  console.log(`🚀 Servidor Express corriendo en puerto ${PORT}`);
 });
