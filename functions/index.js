@@ -10,9 +10,11 @@ app.use(cors());
 app.use(express.json());
 
 // Configura MercadoPago con el token del .env
-mercadopago.configure({
-  access_token: process.env.MERCADOPAGO_ACCESS_TOKEN,
+const mp = new mercadopago.MercadoPagoConfig({
+  accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN
 });
+
+const preferenceClient = new mercadopago.Preference(mp);
 
 // Ruta para crear preferencia de pago
 app.post('/create_preference', async (req, res) => {
@@ -35,8 +37,8 @@ app.post('/create_preference', async (req, res) => {
       auto_return: 'approved',
     };
 
-    const response = await mercadopago.preferences.create(preference);
-    res.json({ id: response.body.id });
+    const response = await preferenceClient.create({ body: preference });
+    res.json({ id: response.id });
   } catch (error) {
     console.error('Error creando preferencia:', error);
     res.status(500).json({ error: 'Error al crear preferencia' });
