@@ -11,11 +11,13 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
 
 // Configurar MercadoPago con token desde .env
-mercadopago.configure({
-  access_token: process.env.MERCADOPAGO_ACCESS_TOKEN
+const mp = new mercadopago.MercadoPagoConfig({
+  accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN,
 });
 
-// Ruta vieja (si la usás desde algún HTML del frontend)
+const preferenceClient = new mercadopago.Preference(mp);
+
+// Ruta vieja
 app.post('/create_preference', async (req, res) => {
   try {
     const { title, unit_price, quantity } = req.body;
@@ -36,8 +38,8 @@ app.post('/create_preference', async (req, res) => {
       auto_return: 'approved',
     };
 
-    const response = await mercadopago.preferences.create(preference);
-    res.json({ id: response.body.id });
+    const response = await preferenceClient.create({ body: preference });
+    res.json({ id: response.id });
   } catch (error) {
     console.error('Error en /create_preference:', error);
     res.status(500).json({ error: 'Error al crear preferencia' });
@@ -64,15 +66,15 @@ app.post('/createPreferenceHttp', async (req, res) => {
       auto_return: 'approved',
     };
 
-    const response = await mercadopago.preferences.create(preference);
-    res.json({ init_point: response.body.init_point });
+    const response = await preferenceClient.create({ body: preference });
+    res.json({ init_point: response.init_point });
   } catch (err) {
     console.error('Error en /createPreferenceHttp:', err);
     res.status(500).json({ error: 'Error al crear preferencia' });
   }
 });
 
-// Iniciar el servidor
+// Iniciar servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Servidor Express corriendo en puerto ${PORT}`);
