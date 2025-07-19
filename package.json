@@ -1,4 +1,10 @@
 {
+  "name": "francis-fotografia",
+  "version": "1.0.0",
+  "main": "functions/index.js",
+  "scripts": {
+    "start": "node functions/index.js"
+  },
   "dependencies": {
     "dotenv": "^16.5.0",
     "firebase": "^11.9.0",

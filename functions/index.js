@@ -1,43 +1,50 @@
 // functions/index.js
-require('dotenv').config();
-const functions   = require('firebase-functions');
+
+const express = require('express');
+const cors = require('cors');
 const mercadopago = require('mercadopago');
+require('dotenv').config();
 
-mercadopago.configure({ access_token: process.env.MERCADOPAGO_ACCESS_TOKEN });
-const frontendHost = "https://7ff7-2800-810-552-34c-81ea-d902-74fc-f36e.ngrok-free.app";
+const app = express();
+app.use(cors());
+app.use(express.json());
 
-exports.createPreferenceHttp = functions.https.onRequest(async (req, res) => {
-  // 🔥 Agregar CORS
-  res.set("Access-Control-Allow-Origin", "*");
-  res.set("Access-Control-Allow-Methods", "POST");
-  res.set("Access-Control-Allow-Headers", "Content-Type");
+// Configura MercadoPago con el token del .env
+mercadopago.configure({
+  access_token: process.env.MERCADOPAGO_ACCESS_TOKEN,
+});
 
-  // Manejar preflight
-  if (req.method === "OPTIONS") return res.status(204).send('');
-
-  if (req.method !== 'POST') return res.status(405).send('Only POST');
-  
-  const { total, paymentType } = req.body;
-  if (typeof total !== 'number') return res.status(400).send('`total` must be number');
-
-  const preference = {
-    items: [{ title: "Compra FrancisColor", quantity: 1, currency_id: "ARS", unit_price: total }],
-    payment_methods: paymentType !== 'mercadopago' ? {
-      excluded_payment_types: [{ id: paymentType === 'credit-card' ? 'debit_card' : 'credit_card' }]
-    } : {},
-    back_urls: {
-      success: `${frontendHost}/screens/proceso/completarcompra.html?success=true`,
-      failure: `${frontendHost}/screens/proceso/cart.html`,
-      pending: `${frontendHost}/screens/proceso/cart.html`
-    },
-    auto_return: "approved"
-  };
-
+// Ruta para crear preferencia de pago
+app.post('/create_preference', async (req, res) => {
   try {
+    const { title, unit_price, quantity } = req.body;
+
+    const preference = {
+      items: [
+        {
+          title,
+          unit_price: Number(unit_price),
+          quantity: Number(quantity),
+        },
+      ],
+      back_urls: {
+        success: 'https://francisfotografia.onrender.com/success.html',
+        failure: 'https://francisfotografia.onrender.com/failure.html',
+        pending: 'https://francisfotografia.onrender.com/pending.html',
+      },
+      auto_return: 'approved',
+    };
+
     const response = await mercadopago.preferences.create(preference);
-    return res.json({ init_point: response.body.init_point });
+    res.json({ id: response.body.id });
   } catch (error) {
-    console.error("Error al crear preferencia:", error);
-    return res.status(500).send("Error interno al crear la preferencia de pago.");
+    console.error('Error creando preferencia:', error);
+    res.status(500).json({ error: 'Error al crear preferencia' });
   }
+});
+
+// Inicia el servidor
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
 });
