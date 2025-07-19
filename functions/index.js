@@ -7,7 +7,7 @@ require('dotenv').config();
 const app = express();
 
 app.use(cors({
-  origin: "https://francislaboratoriofotografico.onrender.com"
+  origin: "*", 
 }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
