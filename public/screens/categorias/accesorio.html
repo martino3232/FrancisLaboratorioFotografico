@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Accesorio | Laboratorio Fotografico | Francis Color </title>
+
+  <!-- Google Fonts & FontAwesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+    rel="stylesheet"/>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    integrity="sha512-pzo9U8ixRRTl+..."
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+
+  <!-- CSS Global -->
+  <link rel="stylesheet" href="global.css"/>
+
+  <!-- Estilos específicos -->
+  <style>
+    /* ----------------------------------------------------------
+       LAYOUT: FILTROS + GRILLA
+    ---------------------------------------------------------- */
+    .filter-page {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 2rem;
+      max-width: var(--max-width);
+      margin: 120px auto 4rem; /* espacio para header fijo */
+      padding: 0 1rem;
+    }
+
+    /* ----------------------------------------------------------
+       SIDEBAR DE FILTROS
+    ---------------------------------------------------------- */
+    .filter-sidebar {
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: var(--border-radius);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      position: sticky;
+      top: 100px;
+    }
+    .filter-sidebar h3 {
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
+      color: var(--color-primario);
+    }
+    .filter-group {
+      margin-bottom: 1.5rem;
+    }
+    .filter-group h4 {
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+      color: #444;
+    }
+    .filter-group label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.95rem;
+      margin-bottom: 0.5rem;
+      cursor: pointer;
+    }
+    .filter-group input[type="range"] {
+      width: 100%;
+    }
+    .filter-group .range-value {
+      text-align: right;
+      font-size: 0.9rem;
+      color: #555;
+    }
+    .filter-sidebar .btn-reset {
+      display: block;
+      width: 100%;
+      margin-top: 1rem;
+      padding: 0.6rem;
+      background: var(--color-secundario);
+      color: #fff;
+      border-radius: var(--border-radius);
+      text-align: center;
+      font-weight: 500;
+      transition: background var(--transition-fast);
+    }
+    .filter-sidebar .btn-reset:hover {
+      background: #ddb732;
+    }
+
+    /* ----------------------------------------------------------
+       NO RESULTS
+    ---------------------------------------------------------- */
+    #no-results {
+      text-align: center;
+      margin-top: 2rem;
+      color: #777;
+      font-size: 1.1rem;
+    }
+    /* ――― Botón flotante ――― */
+#cart-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  background: var(--color-primario);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  cursor: pointer;
+  z-index: 1000;
+}
+#cart-toggle .badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: #e74c3c;
+  width: 18px;
+  height: 18px;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+/* ――― Drawer del carrito ――― */
+#cart-drawer {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 320px;
+  height: 100%;
+  background: #fff;
+  box-shadow: -4px 0 24px rgba(0,0,0,0.15);
+  transition: right 0.3s ease;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+}
+#cart-drawer.open {
+  right: 0;
+}
+#cart-drawer .drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+#cart-drawer .drawer-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+#cart-drawer .close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+#cart-items {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+}
+.cart-item {
+  display: flex;
+  margin-bottom: 1rem;
+}
+.cart-item img {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-right: 0.75rem;
+}
+.cart-item .details .name {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+.cart-item .details .qty-price {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #555;
+}
+#cart-drawer .drawer-footer {
+  padding: 1rem;
+  border-top: 1px solid #e0e0e0;
+  text-align: center;
+}
+#cart-drawer .checkout-btn {
+  background: var(--color-primario);
+  color: #fff;
+  padding: 0.75rem 1.2rem;
+  border: none;
+  border-radius: var(--border-radius);
+  width: 100%;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+  </style>
+</head>
+<body>
+  <!-- ============================
+       HEADER ULTRA PRO
+  ============================ -->
+  <header class="header">
+    <div class="header__container">
+      <a href="index.html" class="header__logo">Laboratorio Fotografico | Francis Color</a>
+      <nav class="header__nav" id="main-nav">
+        <ul class="nav__list">
+          <li class="nav__item"><a href="index.html" class="nav__link">Inicio</a></li>
+          <li class="nav__item"><a href="categories.html" class="nav__link">Categorías</a></li>
+          <li class="nav__item"><a href="cart.html" class="nav__link">Carrito</a></li>
+        </ul>
+      </nav>
+      <div class="header__actions">
+        <a href="cart.html" class="btn btn--cart">
+          <i class="fas fa-shopping-cart"></i> Carrito
+        </a>
+        <button class="header__toggle" id="nav-toggle" aria-label="Abrir menú">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============================
+       FILTROS + GRILLA DE Accesorio
+  ============================ -->
+  <div class="filter-page">
+    <!-- Sidebar de filtros -->
+    <aside class="filter-sidebar">
+      <h3>Filtrar Accesorio</h3>
+
+      <div class="filter-group">
+        <h4>Precio Máximo</h4>
+        <input
+          type="range"
+          id="price-range"
+          min="0"
+          max="10000"
+          step="50"
+          value="10000"
+        />
+        <div class="range-value">Hasta $<span id="price-value">10000</span></div>
+      </div>
+
+      <div class="filter-group">
+        <h4>Tipo</h4>
+        <label><input type="checkbox" name="tipo" value="Analógico" checked/> Analógico</label>
+        <label><input type="checkbox" name="tipo" value="Digital" checked/> Digital</label>
+      </div>
+
+      <div class="filter-group">
+        <h4>Búsqueda</h4>
+        <input
+          type="text"
+          id="search-input"
+          placeholder="Nombre del accesorio..."
+          style="width:100%;padding:0.5rem;border:1px solid #ddd;border-radius:var(--border-radius);"
+        />
+      </div>
+
+      <button id="btn-reset" class="btn-reset">Reiniciar filtros</button>
+    </aside>
+
+    <!-- Sección productos -->
+    <section>
+      <h2 style="margin-bottom:1rem;">Accesorio</h2>
+      <div id="loader-acc" class="loader"></div>
+      <div id="products-grid-acc" class="products-grid"></div>
+      <div id="no-results" style="display:none;">No se encontraron Accesorio.</div>
+    </section>
+  </div>
+  <!-- Botón flotante -->
+<div id="cart-toggle">
+  <i class="fas fa-shopping-bag"></i>
+  <span class="badge" id="cart-badge">0</span>
+</div>
+
+<!-- Drawer -->
+<aside id="cart-drawer">
+  <div class="drawer-header">
+    <h3>Tu Carrito</h3>
+    <button class="close-btn" id="cart-close">&times;</button>
+  </div>
+  <div id="cart-items">
+    <!-- Productos inyectados por JS -->
+  </div>
+  <div class="drawer-footer">
+    <button class="checkout-btn" id="checkout-btn">Ir al Checkout</button>
+  </div>
+</aside>
+
+  <!-- ============================
+       FOOTER ULTRA PRO
+  ============================ -->
+  <footer>
+    <div class="footer-container">
+      <div class="footer-col">
+        <h4>Laboratorio Fotografico | Francis Color</h4>
+        <p>Laboratorio y servicios fotográficos profesionales. ¡Calidad y velocidad a tu alcance!</p>
+      </div>
+      <div class="footer-col">
+        <h4>Categorías</h4>
+        <ul>
+          <li><a href="foto.html">Fotos</a></li>
+          <li><a href="banner.html">Banners</a></li>
+          <li><a href="Accesorio.html">Accesorio</a></li>
+          <li><a href="lona.html">Lonas</a></li>
+          <li><a href="servicio.html">Servicios</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Atención al Cliente</h4>
+        <ul>
+          <li><a href="contact.html">Contacto</a></li>
+          <li><a href="faq.html">Preguntas Frecuentes</a></li>
+          <li><a href="returns.html">Devoluciones</a></li>
+          <li><a href="shipping.html">Envíos</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Síguenos</h4>
+        <div class="social-icons">
+          <a href="#"><i class="fab fa-facebook-square"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-whatsapp-square"></i></a>
+          <a href="#"><i class="fab fa-youtube-square"></i></a>
+        </div>
+        <div class="payment-icons" style="margin-top:1rem;">
+          <i class="fab fa-cc-visa fa-2x"></i>
+          <i class="fab fa-cc-mastercard fa-2x"></i>
+          <i class="fab fa-cc-amex fa-2x"></i>
+          <i class="fab fa-cc-paypal fa-2x"></i>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">&copy; 2025 Laboratorio Fotografico | Francis Color. Todos los derechos reservados.</div>
+  </footer>
+
+  <!-- Toggle menú móvil -->
+  <script>
+    document.getElementById('nav-toggle').addEventListener('click', () => {
+      document.getElementById('main-nav').classList.toggle('open');
+    });
+  </script>
+
+  <!-- Firestore + lógica de filtros -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import {
+      getFirestore, collection, getDocs, query, where
+    } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+    // Configuración Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyBWrYvbvTEhX_ZGswZEtfOUBhCJ34wp92M",
+      authDomain: "francisfotografia-a8ec2.firebaseapp.com",
+      projectId: "francisfotografia-a8ec2",
+      storageBucket: "francisfotografia-a8ec2.firebasestorage.app",
+      messagingSenderId: "372558145730",
+      appId: "1:372558145730:web:f2f33f67ab7175723c335b"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db  = getFirestore(app);
+    const col = collection(db, "productos");
+
+    // Estado local
+    let allAccesorio = [];
+
+    // Crear tarjeta de producto
+    function crearCardProducto(productoData, productoId) {
+      const { nombre, precio, urlImagen, tipo, categoria } = productoData;
+
+      // 1) Contenedor principal
+      const card = document.createElement("div");
+      card.classList.add("product-card");
+
+      // 2) Imagen envuelta en <a>
+      const img = document.createElement("img");
+      img.src = urlImagen;
+      img.alt = nombre;
+      img.style.cursor = "pointer";
+
+      const linkImg = document.createElement("a");
+      linkImg.href = `/screens/detalle/detalleproducto.html`;
+      // 👉 Antes de navegar, guardo datos completos del producto
+      linkImg.addEventListener('click', () => {
+        localStorage.setItem(
+          'selectedProduct',
+          JSON.stringify({ id: productoId, nombre, precio, urlImagen, tipo, categoria })
+        );
+      });
+      linkImg.appendChild(img);
+      card.appendChild(linkImg);
+
+      // 3) Contenido textual
+      const contenido = document.createElement("div");
+      contenido.classList.add("card-content");
+
+      // Título
+      const titulo = document.createElement("h3");
+      titulo.textContent = nombre;
+      contenido.appendChild(titulo);
+
+      // Categoría
+      const infoCat = document.createElement("p");
+      infoCat.textContent = categoria ? categoria.toUpperCase() : "SIN CATEGORÍA";
+      infoCat.style.fontStyle = "italic";
+      infoCat.style.color = "#555";
+      contenido.appendChild(infoCat);
+
+      // Tipo
+      const infoTipo = document.createElement("p");
+      infoTipo.textContent = tipo ? tipo.toUpperCase() : "";
+      infoTipo.style.fontSize = "0.85rem";
+      infoTipo.style.color = "#777";
+      contenido.appendChild(infoTipo);
+
+      // Precio
+      const precioEl = document.createElement("div");
+      precioEl.classList.add("price");
+      precioEl.textContent = `$ ${Number(precio).toLocaleString('es-AR')}`;
+      contenido.appendChild(precioEl);
+
+      // 4) Botones de acción
+      const btnContainer = document.createElement("div");
+      btnContainer.classList.add("card-buttons");
+
+      // Agregar al carrito
+      const btnCart = document.createElement("button");
+      btnCart.classList.add("btn-cart");
+      btnCart.textContent = "Agregar al carrito";
+      // aquí podrías asignar btnCart.dataset.id = productoId;
+      btnContainer.appendChild(btnCart);
+
+      // Comprar ahora
+      const btnBuy = document.createElement("button");
+      btnBuy.classList.add("btn-buy");
+      btnBuy.textContent = "Comprar ahora";
+      btnContainer.appendChild(btnBuy);
+
+      contenido.appendChild(btnContainer);
+
+      card.appendChild(contenido);
+      return card;
+    }
+
+    // Carga inicial de Accesorio
+    async function fetchAccesorio() {
+      document.getElementById("loader-acc").style.display = "block";
+      const q    = query(col, where("categoria","==","Accesorio"));
+      const snap = await getDocs(q);
+      allAccesorio = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      document.getElementById("loader-acc").style.display = "none";
+      applyFilters();
+    }
+
+    // Aplicar filtros
+    function applyFilters() {
+      const grid     = document.getElementById("products-grid-acc");
+      const maxPrice = +document.getElementById("price-range").value;
+      const types    = Array.from(document.querySelectorAll('input[name="tipo"]:checked')).map(cb=>cb.value);
+      const search   = document.getElementById("search-input").value.toLowerCase();
+      grid.innerHTML = "";
+
+      const filtered = allAccesorio.filter(p =>
+        p.precio <= maxPrice &&
+        types.includes(p.tipo) &&
+        p.nombre.toLowerCase().includes(search)
+      );
+
+      if (!filtered.length) {
+        document.getElementById("no-results").style.display = "block";
+      } else {
+        document.getElementById("no-results").style.display = "none";
+        filtered.forEach(p => grid.appendChild(crearCardProducto(p, p.id)));
+      }
+    }
+
+    // Listeners
+    document.getElementById("price-range").addEventListener("input", e => {
+      document.getElementById("price-value").textContent = e.target.value;
+      applyFilters();
+    });
+    document.querySelectorAll('input[name="tipo"]').forEach(cb =>
+      cb.addEventListener("change", applyFilters)
+    );
+    document.getElementById("search-input").addEventListener("input", applyFilters);
+    document.getElementById("btn-reset").addEventListener("click", () => {
+      const max = document.getElementById("price-range").max;
+      document.getElementById("price-range").value = max;
+      document.getElementById("price-value").textContent = max;
+      document.querySelectorAll('input[name="tipo"]').forEach(cb=>cb.checked=true);
+      document.getElementById("search-input").value = "";
+      applyFilters();
+    });
+
+    // — API de carrito — 
+    function getCart() {
+      const raw = localStorage.getItem('cart');
+      return raw ? JSON.parse(raw) : {};
+    }
+    function saveCart(cart) {
+      localStorage.setItem('cart', JSON.stringify(cart));
+    }
+    function updateCartBadge() {
+      const total = Object.values(getCart()).reduce((sum, i) => sum + i.qty, 0);
+      document.getElementById('cart-badge').textContent = total;
+    }
+    function renderCartOverlay() {
+      const cart = getCart();
+      const container = document.getElementById('cart-items');
+      if (!container) return;
+      if (!Object.keys(cart).length) {
+        container.innerHTML = '<p style="text-align:center; padding:1rem">Tu carrito está vacío</p>';
+        return;
+      }
+      container.innerHTML = Object.entries(cart).map(([id, item]) => `
+        <div class="cart-item">
+          <img src="${item.urlImagen}" alt="${item.nombre}">
+          <div class="details">
+            <p class="name">${item.nombre}</p>
+            <p class="qty-price">${item.qty} x $${Number(item.precio).toLocaleString('es-AR')}</p>
+          </div>
+        </div>
+      `).join('');
+    }
+    function addToCart(id, data) {
+      const cart = getCart();
+      if (cart[id]) {
+        cart[id].qty++;
+      } else {
+        cart[id] = {...data, qty:1};
+      }
+      saveCart(cart);
+      updateCartBadge();
+      renderCartOverlay();
+    }
+
+    // — Listeners de apertura/cierre drawer — 
+    document.getElementById('cart-toggle')
+      .addEventListener('click', () => {
+        document.getElementById('cart-drawer').classList.add('open');
+        updateCartBadge();
+        renderCartOverlay();
+      });
+    document.getElementById('cart-close')
+      .addEventListener('click', () => {
+        document.getElementById('cart-drawer').classList.remove('open');
+      });
+
+    // — Inicialización al cargar la página — 
+    document.addEventListener('DOMContentLoaded', () => {
+      updateCartBadge();
+      renderCartOverlay();
+    });
+
+
+    document.addEventListener("DOMContentLoaded", fetchAccesorio);
+  </script>
+</body>
+</html>

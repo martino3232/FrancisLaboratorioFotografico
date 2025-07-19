@@ -1,0 +1,1643 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Impresión de Fotos 10x15 | Laboratorio Fotografico | Francis Color </title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Font Awesome -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    integrity="sha512-pzo9U8ixRRTl+lyx8kkz+YMDpao+fKlW+OxyVd09O8Qzs165b7eOMPIHz4Lm/KmPdvfI9e5YXA+ybxILgY7kqw=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+
+  <!-- Estilos Ultra Pro (inspirado en MercadoLibre) -->
+  <style>
+    /* ----------------------------------------------------------
+       VARIABLES GLOBALES
+    ---------------------------------------------------------- */
+    :root {
+      --color-primario: #111;              /* Negro profundo */
+      --color-secundario: #f0c040;         /* Dorado brillante */
+      --color-acento: #28a745;             /* Verde para stock */
+      --color-fondo: #f5f5f5;              /* Gris muy claro */
+      --color-texto: #333;                 /* Gris oscuro */
+      --color-texto-claro: #fff;           /* Blanco puro */
+      --color-borde: #e0e0e0;              /* Gris claro para bordes */
+      --color-detalle: #777;               /* Gris medio */
+      --border-radius: 8px;
+      --transition-fast: 0.2s ease;
+      --font-base: 'Roboto', sans-serif;
+      --max-width: 1300px;
+      --shadow-light: rgba(0, 0, 0, 0.05);
+      --shadow-dark: rgba(0, 0, 0, 0.1);
+    }
+
+    /* ----------------------------------------------------------
+       RESET BÁSICO
+    ---------------------------------------------------------- */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html {
+      font-family: var(--font-base);
+      scroll-behavior: smooth;
+    }
+    body {
+      background-color: var(--color-fondo);
+      color: var(--color-texto);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+    img {
+      max-width: 100%;
+      display: block;
+    }
+    button {
+      cursor: pointer;
+      font-family: var(--font-base);
+      border: none;
+      background: none;
+    }
+    ul {
+      list-style: none;
+    }
+
+    /* ----------------------------------------------------------
+       NAVBAR
+    ---------------------------------------------------------- */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      background: transparent;
+    }
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2rem;
+      max-width: var(--max-width);
+      margin: 0 auto;
+    }
+    .navbar .logo a {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--color-texto-claro);
+      letter-spacing: 1px;
+    }
+    .navbar nav ul {
+      display: flex;
+      list-style: none;
+      align-items: center;
+    }
+    .navbar nav ul li {
+      margin-left: 1.5rem;
+    }
+    .navbar nav ul li a {
+      color: var(--color-texto-claro);
+      font-weight: 500;
+      font-size: 0.95rem;
+      padding: 0.25rem 0.5rem;
+      transition: color var(--transition-fast);
+    }
+    .navbar nav ul li a:hover {
+      color: var(--color-secundario);
+    }
+    .navbar .btn-cart {
+      background-color: var(--color-secundario);
+      color: var(--color-primario);
+      padding: 0.5rem 0.9rem;
+      border-radius: var(--border-radius);
+      font-weight: 500;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      transition: background-color var(--transition-fast);
+    }
+    .navbar .btn-cart:hover {
+      background-color: #ddb732;
+    }
+    .navbar-scrolled {
+      background: rgba(0,0,0,0.85);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    /* ----------------------------------------------------------
+       BREADCRUMBS
+    ---------------------------------------------------------- */
+    .breadcrumbs {
+      margin-top: 80px; /* compensar navbar */
+      padding: 1rem 2rem;
+      background-color: #fff;
+      font-size: 0.9rem;
+      max-width: var(--max-width);
+      margin-left: auto;
+      margin-right: auto;
+      border-bottom: 1px solid var(--color-borde);
+    }
+    .breadcrumbs a {
+      color: #555;
+      font-weight: 500;
+    }
+    .breadcrumbs span {
+      margin: 0 0.5rem;
+      color: #888;
+    }
+
+    /* ----------------------------------------------------------
+       CONTENEDOR PRINCIPAL
+    ---------------------------------------------------------- */
+    .product-detail-container {
+      margin: 2rem auto;
+      max-width: var(--max-width);
+      background-color: #fff;
+      border-radius: var(--border-radius);
+      box-shadow: 0 4px 12px var(--shadow-light);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ----------------------------------------------------------
+       SECCIÓN SUPERIOR: IMAGENES + DETALLES
+    ---------------------------------------------------------- */
+    .product-top {
+      display: flex;
+      flex-wrap: wrap;
+    }
+    /* COLUMNA IZQUIERDA: GALERÍA DE IMÁGENES */
+    .product-gallery {
+      flex: 1 1 500px;
+      min-width: 300px;
+      background-color: #fafafa;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .main-image-container {
+      width: 100%;
+      max-width: 500px;
+      height: 500px;
+      border: 1px solid var(--color-borde);
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      background-color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+    .main-image-container img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+    .thumbnails {
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+      width: 100%;
+      max-width: 500px;
+      justify-content: center;
+    }
+    .thumbnail {
+      width: 80px;
+      height: 80px;
+      border: 1px solid var(--color-borde);
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      cursor: pointer;
+      flex: 0 0 auto;
+      background-color: #fff;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    }
+    .thumbnail img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .thumbnail:hover {
+      border-color: var(--color-secundario);
+    }
+    .thumbnail.active {
+      border-color: var(--color-secundario);
+      box-shadow: 0 0 8px var(--shadow-dark);
+    }
+
+    /* COLUMNA DERECHA: DETALLES DEL PRODUCTO */
+    .product-info {
+      flex: 1 1 500px;
+      min-width: 300px;
+      padding: 2rem 2rem 2rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .product-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: var(--color-primario);
+    }
+    .product-meta {
+      font-size: 0.95rem;
+      color: var(--color-detalle);
+      margin-bottom: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+    .product-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    .product-meta i {
+      color: var(--color-secundario);
+    }
+    .product-price {
+      font-size: 2.25rem;
+      font-weight: 800;
+      color: var(--color-secundario);
+      margin-bottom: 0.5rem;
+    }
+    .installments {
+      font-size: 1rem;
+      color: var(--color-detalle);
+      margin-bottom: 1rem;
+    }
+    .shipping-info {
+      font-size: 1rem;
+      color: #28a745;
+      font-weight: 500;
+      margin-bottom: 1rem;
+    }
+    .product-stock {
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+    .in-stock {
+      color: var(--color-acento);
+      font-weight: 500;
+    }
+    .out-of-stock {
+      color: #dc3545;
+      font-weight: 500;
+    }
+    .product-description-short {
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+      color: var(--color-texto);
+      line-height: 1.5;
+    }
+    .quantity-add {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .quantity-add label {
+      font-size: 1rem;
+      font-weight: 500;
+      margin-right: 0.5rem;
+      color: var(--color-texto);
+    }
+    .quantity-add input[type="number"] {
+      width: 80px;
+      padding: 0.4rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+      text-align: center;
+    }
+    .btn-buy-now,
+    .btn-add-cart {
+      width: 100%;
+      text-align: center;
+      padding: 0.75rem 1rem;
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      font-weight: 600;
+      transition: background-color var(--transition-fast), box-shadow var(--transition-fast);
+      margin-bottom: 1rem;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .btn-buy-now {
+      background-color: #ddb732;
+      color: #fff;
+    }
+    .btn-buy-now:hover {
+      background-color: #ddb732;
+      box-shadow: 0 4px 12px var(--shadow-dark);
+    }
+    .btn-add-cart {
+      background-color: var(--color-primario);
+      color: var(--color-texto-claro);
+    }
+    .btn-add-cart:hover {
+      background-color: #222;
+      box-shadow: 0 4px 12px var(--shadow-dark);
+    }
+    .btn-favorite {
+      background: none;
+      color: var(--color-detalle);
+      font-size: 1.5rem;
+      transition: color var(--transition-fast);
+      align-self: flex-start;
+      margin-top: -0.5rem;
+    }
+    .btn-favorite:hover {
+      color: var(--color-secundario);
+    }
+
+    /* ----------------------------------------------------------
+       SECCIÓN DE INFORMACIÓN ADICIONAL Y VENDEDOR
+    ---------------------------------------------------------- */
+    .product-extra {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      margin-top: 2rem;
+      padding: 0 2rem 2rem 2rem;
+    }
+    /* VENDEDOR Y GARANTÍAS */
+    .seller-info {
+      flex: 1 1 300px;
+      background-color: #fff;
+      border: 1px solid var(--color-borde);
+      border-radius: var(--border-radius);
+      padding: 1.5rem;
+      box-shadow: 0 4px 8px var(--shadow-light);
+    }
+    .seller-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+    .seller-header h4 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--color-primario);
+    }
+    .seller-follow {
+      background-color: #ddb732;
+      color: #fff;
+      padding: 0.3rem 0.8rem;
+      border-radius: var(--border-radius);
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: background-color var(--transition-fast);
+    }
+    .seller-follow:hover {
+      background-color: #ddb732;
+    }
+    .seller-details {
+      margin: 1rem 0;
+      font-size: 0.95rem;
+      color: var(--color-texto);
+    }
+    .seller-details span {
+      display: block;
+      margin: 0.3rem 0;
+    }
+    .seller-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.95rem;
+      color: #28a745;
+      font-weight: 500;
+    }
+    .seller-badge i {
+      color: #28a745;
+    }
+    .seller-rating {
+      margin-top: 0.8rem;
+      font-size: 0.9rem;
+      color: var(--color-detalle);
+    }
+    .seller-rating i {
+      color: #ffc107;
+      margin-right: 0.2rem;
+    }
+
+    .policies-info {
+      flex: 1 1 300px;
+      background-color: #fff;
+      border: 1px solid var(--color-borde);
+      border-radius: var(--border-radius);
+      padding: 1.5rem;
+      box-shadow: 0 4px 8px var(--shadow-light);
+    }
+    .policies-info h4 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--color-primario);
+    }
+    .policy-item {
+      display: flex;
+      align-items: start;
+      gap: 0.5rem;
+      margin-bottom: 0.8rem;
+      font-size: 0.95rem;
+    }
+    .policy-item i {
+      color: var(--color-secundario);
+      font-size: 1.1rem;
+      margin-top: 0.1rem;
+    }
+    .policy-item span {
+      line-height: 1.3;
+      color: var(--color-texto);
+    }
+
+    /* ----------------------------------------------------------
+       SECCIÓN DE ESPECIFICACIONES DEL PRODUCTO
+    ---------------------------------------------------------- */
+    .specs-section {
+      background-color: #fff;
+      border-top: 1px solid var(--color-borde);
+      padding: 2rem;
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+    .specs-main {
+      flex: 2 1 500px;
+    }
+    .specs-main h3 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: var(--color-primario);
+    }
+    .specs-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 2rem;
+    }
+    .specs-table th, .specs-table td {
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--color-borde);
+      font-size: 0.95rem;
+    }
+    .specs-table th {
+      background-color: #fafafa;
+      text-align: left;
+      font-weight: 500;
+      color: var(--color-texto);
+    }
+    .specs-table td {
+      color: var(--color-detalle);
+    }
+
+    /* ----------------------------------------------------------
+       SECCIÓN DESCRIPCIÓN EXPANDIBLE
+    ---------------------------------------------------------- */
+    .description-section {
+      flex: 3 1 600px;
+    }
+    .description-section h3 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: var(--color-primario);
+    }
+    .description-short {
+      font-size: 1rem;
+      color: var(--color-texto);
+      line-height: 1.5;
+      margin-bottom: 1rem;
+    }
+    .description-long {
+      display: none;
+      font-size: 1rem;
+      color: var(--color-texto);
+      line-height: 1.5;
+      margin-top: 1rem;
+    }
+    .btn-toggle-desc {
+      font-size: 0.95rem;
+      color: #ddb732;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .btn-toggle-desc i {
+      transition: transform var(--transition-fast);
+    }
+    .btn-toggle-desc.expanded i {
+      transform: rotate(180deg);
+    }
+
+    /* ----------------------------------------------------------
+       SECCIÓN "QUIENES VIERON ESTE PRODUCTO TAMBIÉN COMPRARON"
+    ---------------------------------------------------------- */
+    .related-carousel {
+      background-color: #fff;
+      border-top: 1px solid var(--color-borde);
+      padding: 2rem;
+    }
+    .related-carousel h3 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: var(--color-primario);
+    }
+    .carousel-container {
+      position: relative;
+    }
+    .carousel-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(200px, 1fr));
+      gap: 1.5rem;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      padding-bottom: 0.5rem;
+    }
+    .carousel-card {
+      background-color: #fff;
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      box-shadow: 0 4px 8px var(--shadow-light);
+      transition: transform 0.3s, box-shadow 0.3s;
+      min-width: 200px;
+    }
+    .carousel-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 12px var(--shadow-dark);
+    }
+    .carousel-card img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+    }
+    .carousel-card .card-content {
+      padding: 0.75rem 1rem;
+    }
+    .carousel-card .card-content h4 {
+      font-size: 1rem;
+      margin-bottom: 0.3rem;
+      color: #333;
+      height: 2.4rem;
+      overflow: hidden;
+    }
+    .carousel-card .card-content .price {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--color-secundario);
+      margin-bottom: 0.3rem;
+    }
+    .carousel-card .card-content .btn-see {
+      font-size: 0.9rem;
+      color: #ddb732;
+      font-weight: 500;
+      transition: color var(--transition-fast);
+    }
+    .carousel-card .card-content .btn-see:hover {
+      color: #ddb732;
+    }
+    .carousel-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: rgba(255, 255, 255, 0.8);
+      border: 1px solid var(--color-borde);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color var(--transition-fast);
+      z-index: 10;
+    }
+    .carousel-arrow:hover {
+      background-color: #fff;
+    }
+    .carousel-arrow.left {
+      left: -20px;
+    }
+    .carousel-arrow.right {
+      right: -20px;
+    }
+
+    /* ----------------------------------------------------------
+       FOOTER
+    ---------------------------------------------------------- */
+    footer {
+      background-color: #222;
+      color: #ccc;
+      padding: 3rem 2rem 1rem;
+      margin-top: 3rem;
+    }
+    .footer-container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+    .footer-col {
+      flex: 1 1 220px;
+      margin-bottom: 2rem;
+    }
+    .footer-col h4 {
+      color: var(--color-texto-claro);
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    .footer-col ul {
+      list-style: none;
+    }
+    .footer-col ul li {
+      margin-bottom: 0.6rem;
+    }
+    .footer-col ul li a {
+      color: #ccc;
+      font-size: 0.9rem;
+      transition: color var(--transition-fast);
+    }
+    .footer-col ul li a:hover {
+      color: var(--color-secundario);
+    }
+    .social-icons {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+    }
+    .social-icons a {
+      color: #ccc;
+      font-size: 1.3rem;
+      transition: color var(--transition-fast);
+    }
+    .social-icons a:hover {
+      color: var(--color-secundario);
+    }
+    .footer-bottom {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 0.85rem;
+      color: #777;
+    }
+
+    /* ----------------------------------------------------------
+       RESPONSIVO
+    ---------------------------------------------------------- */
+    @media (max-width: 1024px) {
+      .product-top {
+        flex-direction: column-reverse;
+      }
+      .product-gallery,
+      .product-info {
+        width: 100%;
+      }
+      .main-image-container {
+        height: 400px;
+      }
+      .specs-section {
+        flex-direction: column;
+      }
+      .related-carousel .carousel-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      }
+      .carousel-arrow.left {
+        left: 0;
+      }
+      .carousel-arrow.right {
+        right: 0;
+      }
+    }
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 0.75rem 1.5rem;
+      }
+      .breadcrumbs {
+        padding: 1rem;
+      }
+      .product-gallery {
+        padding: 1rem;
+      }
+      .main-image-container {
+        height: 300px;
+      }
+      .thumbnails {
+        max-width: 300px;
+      }
+      .product-info {
+        padding: 1rem 1rem 2rem 1rem;
+      }
+      .product-title {
+        font-size: 1.5rem;
+      }
+      .product-price {
+        font-size: 1.75rem;
+      }
+      .installments,
+      .shipping-info {
+        font-size: 0.9rem;
+      }
+      .product-description-short {
+        font-size: 0.95rem;
+      }
+      .quantity-add label {
+        font-size: 0.9rem;
+      }
+      .btn-buy-now,
+      .btn-add-cart {
+        font-size: 0.9rem;
+        padding: 0.6rem 1rem;
+      }
+      .product-extra {
+        flex-direction: column;
+      }
+      .seller-info,
+      .policies-info,
+      .specs-section,
+      .description-section {
+        width: 100%;
+      }
+      .related-carousel {
+        padding: 1rem;
+      }
+      .related-carousel .carousel-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      }
+      .carousel-arrow {
+        display: none;
+      }
+      .footer {
+        padding: 2rem 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- ============================
+        HEADER / NAVBAR
+  ============================ -->
+  <header>
+    <div id="navbar" class="navbar navbar-transparent">
+      <div class="logo">
+        <a href="index.html">Laboratorio Fotografico | Francis Color</a>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="index.html">Inicio</a></li>
+          <li><a href="categories.html">Categorías</a></li>
+          <li><a href="about.html">Quiénes Somos</a></li>
+          <li><a href="contact.html">Contacto</a></li>
+          <li><a href="login.html">Ingresar</a></li>
+        </ul>
+      </nav>
+      <a href="cart.html" class="btn-cart">
+        <i class="fas fa-shopping-cart"></i>&nbsp;Carrito
+      </a>
+    </div>
+  </header>
+
+  <!-- ============================
+        BREADCRUMBS
+  ============================ -->
+  <div class="breadcrumbs">
+    <a href="index.html">Inicio</a><span>/</span>
+    <a href="categories.html?cat=Foto">Foto</a><span>/</span>
+    <span id="breadcrumb-product">Impresión de Fotos 10x15</span>
+  </div>
+
+  <!-- ============================
+        CONTENEDOR PRINCIPAL
+  ============================ -->
+  <div class="product-detail-container" id="product-detail-container">
+
+    <!-- ============================
+         SECCIÓN SUPERIOR: GALERÍA Y DETALLES
+    ============================ -->
+    <div class="product-top">
+
+      <!-- GALERÍA DE IMÁGENES -->
+      <div class="product-gallery">
+        <div class="main-image-container">
+          <img id="main-image" src="https://imagenafotos.com/328111-thickbox_default/impresion-de-fotos-10x15-revelado-en-papel-fotografico.jpg" alt="Impresión de Fotos 10x15" />
+        </div>
+        
+      </div>
+
+      <!-- DETALLES DEL PRODUCTO -->
+      <div class="product-info">
+        <div>
+          <h1 class="product-title" id="product-title">Impresión de Fotos 10x15 Revelado en Papel Fotográfico</h1>
+          <div class="product-meta" id="product-meta">
+            <span><i class="fas fa-tag"></i> Categoría: Foto</span>
+          </div>
+          <div class="product-price" id="product-price">$1.600</div>
+          <div class="installments">en 6 cuotas de $266</div>
+          <div class="shipping-info">
+            <i class="fas fa-truck"></i> Llega en 24 horas.
+          </div>
+          <div class="product-stock" id="product-stock">
+            <span class="in-stock"><i class="fas fa-check-circle"></i> En stock</span>
+          </div>
+          <p class="product-description-short" id="product-description-short"></p>
+          <p class="product-description-short" id="product-description" style="color: green; font-size: larger;">
+            Una vez abonada tu compra te llegaran las instrucciones via e-mail para tu revelado / impresion / diseño.
+          </p>
+        </div>
+        <div>
+          <div class="quantity-add">
+            <label for="quantity">Cantidad:</label>
+            <input type="number" id="quantity" value="1" min="1" />
+          </div>
+          <div class="custom-dropdown">
+          <label for="paper-type">Tipo de papel:</label>
+          <div class="dropdown" id="paper-dropdown">
+            <button type="button" class="dropdown-btn" data-target="paper-type-input">Seleccione papel</button>
+            <div class="dropdown-content">
+              <div class="dropdown-item" data-value="Mate">
+                <img src="https://libreriairbe.com/wp-content/uploads/2021/04/Paquete-20-Hojas-de-Papel-Fotografico-Mate-200-g-Tamano-A4-Vista-320x320.jpg" alt="Papel Mate">
+                <span>Papel Mate</span>
+              </div>
+              <div class="dropdown-item" data-value="Brillante">
+                <img src="https://http2.mlstatic.com/D_NQ_NP_622765-MLB44783662397_022021-O.webp" alt="Papel Brillante">
+                <span>Papel Brillante</span>
+              </div>
+            </div>
+            <input type="hidden" id="paper-type-input" name="paper-type" />
+          </div>
+        </div>
+
+        <div class="custom-dropdown">
+          <label for="border-type">Tipo de borde:</label>
+          <div class="dropdown" id="border-dropdown">
+            <button type="button" class="dropdown-btn" data-target="border-type-input">Seleccione borde</button>
+            <div class="dropdown-content">
+              <div class="dropdown-item" data-value="Borde Blanco">
+                <img src="https://media.istockphoto.com/id/185327514/es/foto/blanco-polaroid-clipping-path-borde-de-corte.jpg?s=170667a&w=0&k=20&c=8yClz28pkU6Y0swPdSajyBJjE1mV7YgtZzNi2uo4KUw=" alt="Borde Redondeado">
+                <span>Borde blanco</span>
+              </div>
+              <div class="dropdown-item" data-value="Sin borde">
+                <img src="https://www.centrolavalle.com.ar/images/000000000FC2-0111518905-flyer.jpg" alt="Borde Recto">
+                <span>Sin borde</span>
+              </div>
+            </div>
+            <input type="hidden" id="border-type-input" name="border-type" />
+          </div>
+        </div>
+
+        <script>
+          document.querySelectorAll('.dropdown').forEach(dropdown => {
+            const btn = dropdown.querySelector('.dropdown-btn');
+            const menu = dropdown.querySelector('.dropdown-content');
+            const input = document.getElementById(btn.dataset.target);
+
+            // Toggle dropdown
+            btn.addEventListener('click', e => {
+              e.stopPropagation();
+              document.querySelectorAll('.dropdown-content').forEach(dc => {
+                if (dc !== menu) dc.style.display = 'none';
+              });
+              menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+            });
+
+            // Handle selection
+            menu.querySelectorAll('.dropdown-item').forEach(item => {
+              item.addEventListener('click', () => {
+                const value = item.dataset.value;
+                const text = item.querySelector('span').innerText;
+                btn.innerText = text;
+                btn.appendChild(document.createTextNode(''));
+                input.value = value;
+                menu.style.display = 'none';
+              });
+            });
+          });
+
+          // Close all on outside click
+          document.addEventListener('click', () => {
+            document.querySelectorAll('.dropdown-content').forEach(menu => menu.style.display = 'none');
+          });
+        </script>
+          <button class="btn-buy-now" id="btn-buy-now">
+            <i class="fas fa-shopping-cart"></i> Comprar ahora
+          </button>
+          <button class="btn-add-cart" id="btn-add-cart">
+            <i class="fas fa-cart-plus"></i> Agregar al carrito
+          </button>
+          <button class="btn-favorite" id="btn-favorite" title="Agregar a favoritos">
+            <i class="fas fa-heart"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================
+         SECCIÓN DE INFORMACIÓN ADICIONAL Y VENDEDOR
+    ============================ -->
+    <div class="product-extra">
+
+      <!-- VENDEDOR Y GARANTÍAS -->
+      <div class="seller-info">
+        <div class="seller-header">
+          <h4>Vendido por: Francis Labs</h4>
+          <button class="seller-follow"><i class="fas fa-plus"></i> Seguir</button>
+        </div>
+        <div class="seller-details">
+          <span><strong>MercadoLíder Platinum</strong></span>
+          <span class="seller-badge"><i class="fas fa-thumbs-up"></i> +500 ventas</span>
+          <div class="seller-rating">
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            (50 calificaciones)
+          </div>
+        </div>
+        <div class="seller-guarantee">
+          <h4>Garantía</h4>
+          <p>6 meses de garantía de fábrica</p>
+        </div>
+      </div>
+
+      <!-- POLÍTICAS DE COMPRA -->
+      <div class="policies-info">
+        <h4>Políticas</h4>
+        <div class="policy-item">
+          <i class="fas fa-undo"></i>
+          <span>Devolución gratis. Tenés 30 días desde que lo recibís.</span>
+        </div>
+        <div class="policy-item">
+          <i class="fas fa-shield-alt"></i>
+          <span>Compra Protegida, recibí el producto que esperabas o te devolvemos tu dinero.</span>
+        </div>
+        <div class="policy-item">
+          <i class="fas fa-truck"></i>
+          <span>Despacha sus productos a tiempo</span>
+        </div>
+        <div class="policy-item">
+          <i class="fas fa-certificate"></i>
+          <span>MercadoPuntos: Ganá 10 puntos comprando</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         SECCIÓN DE ESPECIFICACIONES & DESCRIPCIÓN EXPANDIBLE
+    ============================================================ -->
+    <div class="specs-section">
+
+      <!-- ESPECIFICACIONES PRINCIPALES -->
+      <div class="specs-main">
+        <h3>Características del producto</h3>
+        <table class="specs-table">
+          <tr>
+            <th>Marca</th>
+            <td>Laboratorio Francis Color</td>
+          </tr>
+          <tr>
+            <th>Categoría</th>
+            <td>Foto</td>
+          </tr>
+          <tr>
+            <th>Tipo</th>
+            <td>Digital</td>
+          </tr>
+          <tr>
+            <th>Producción</th>
+            <td>Listo en 24 horas</td>
+          </tr>
+          <tr>
+            <th>Origen</th>
+            <td>Hecho en Argentina</td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- DESCRIPCIÓN EXPANDIBLE -->
+      <div class="description-section">
+        <h3>Descripción</h3>
+        <p class="description-short" id="product-description-short">
+          Imprime tus recuerdos con la mejor calidad
+        </p>
+        <div class="description-long" id="description-long">
+          <p>
+            Nuestro servicio utiliza papel fotográfico Premium con acabado brillante o mate para ofrecer imágenes nítidas y llenas de color. Cada fotografía pasa por un riguroso control de calidad para asegurar la mejor reproducción de tonos y detalle. El papel de alta gramaje garantiza resistencia al paso del tiempo y evita el desvanecimiento prematuro. 
+          </p>
+          <p>
+            <strong>Recomendaciones de uso:</strong>
+            <ul>
+              <li>Guarde sus fotos en un lugar fresco y seco, evitando la exposición directa a la luz solar.</li>
+              <li>Para enmarcar, utilice soportes libres de ácido para prolongar la vida útil de las impresiones.</li>
+            </ul>
+          </p>
+        </div>
+        <button class="btn-toggle-desc" id="btn-toggle-desc">
+          Ver descripción completa <i class="fas fa-chevron-down"></i>
+        </button>
+      </div>
+    </div>
+
+    
+  </div>
+<style>
+    /* ――― Botón flotante ――― */
+.custom-dropdown {
+    margin: 1rem 0;
+  }
+  .custom-dropdown label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+  }
+  .dropdown {
+    position: relative;
+    width: 100%;
+    max-width: 300px;
+  }
+  .dropdown-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0.5rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+  .dropdown-btn::after {
+    content: '\25BC';
+    margin-left: 0.5rem;
+    font-size: 0.8rem;
+  }
+  .dropdown-content {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
+    z-index: 10;
+  }
+  .dropdown-item {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+    cursor: pointer;
+  }
+  .dropdown-item img {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-right: 0.75rem;
+  }
+  .dropdown-item:hover {
+    background: #f0f0f0;
+  }
+
+#cart-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  background: var(--color-primario);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  cursor: pointer;
+  z-index: 1000;
+}
+#cart-toggle .badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: #e74c3c;
+  width: 18px;
+  height: 18px;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+/* ――― Drawer del carrito ――― */
+#cart-drawer {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 320px;
+  height: 100%;
+  background: #fff;
+  box-shadow: -4px 0 24px rgba(0,0,0,0.15);
+  transition: right 0.3s ease;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+}
+#cart-drawer.open {
+  right: 0;
+}
+#cart-drawer .drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+#cart-drawer .drawer-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+#cart-drawer .close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+#cart-items {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+}
+.cart-item {
+  display: flex;
+  margin-bottom: 1rem;
+}
+.cart-item img {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-right: 0.75rem;
+}
+.cart-item .details .name {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+.cart-item .details .qty-price {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #555;
+}
+#cart-drawer .drawer-footer {
+  padding: 1rem;
+  border-top: 1px solid #e0e0e0;
+  text-align: center;
+}
+#cart-drawer .checkout-btn {
+  background: var(--color-primario);
+  color: #fff;
+  padding: 0.75rem 1.2rem;
+  border: none;
+  border-radius: var(--border-radius);
+  width: 100%;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+</style>
+
+<!-- Botón flotante -->
+<div id="cart-toggle">
+  <i class="fas fa-shopping-bag"></i>
+  <span class="badge" id="cart-badge">0</span>
+</div>
+
+<!-- Drawer -->
+<aside id="cart-drawer">
+  <div class="drawer-header">
+    <h3>Tu Carrito</h3>
+    <button class="close-btn" id="cart-close">&times;</button>
+  </div>
+  <div id="cart-items">
+    <!-- Productos inyectados por JS -->
+  </div>
+  <div class="drawer-footer">
+    <button class="checkout-btn" id="checkout-btn">Ir al Checkout</button>
+  </div>
+</aside>
+
+<script type="module">
+    // — API de carrito — 
+function getCart() {
+  const raw = localStorage.getItem('cart');
+  return raw ? JSON.parse(raw) : {};
+}
+function saveCart(cart) {
+  localStorage.setItem('cart', JSON.stringify(cart));
+}
+function updateCartBadge() {
+  const total = Object.values(getCart()).reduce((sum, i) => sum + i.qty, 0);
+  document.getElementById('cart-badge').textContent = total;
+}
+function renderCartOverlay() {
+  const cart = getCart();
+  const container = document.getElementById('cart-items');
+  if (!container) return;
+  if (!Object.keys(cart).length) {
+    container.innerHTML = '<p style="text-align:center; padding:1rem">Tu carrito está vacío</p>';
+    return;
+  }
+  container.innerHTML = Object.entries(cart).map(([id, item]) => `
+    <div class="cart-item">
+      <img src="${item.urlImagen}" alt="${item.nombre}">
+      <div class="details">
+        <p class="name">${item.nombre}</p>
+        <p class="qty-price">${item.qty} x $${Number(item.precio).toLocaleString('es-AR')}</p>
+      </div>
+    </div>
+  `).join('');
+}
+function addToCart(id, data) {
+  const cart = getCart();
+  if (cart[id]) {
+    cart[id].qty += data.qty;
+  } else {
+    cart[id] = data;        // data ya incluye qty, tipoPapel y tipoBorde
+  }
+  saveCart(cart);
+  updateCartBadge();
+  renderCartOverlay();
+}
+
+document.getElementById('btn-add-cart').addEventListener('click', () => {
+  // 1) Obtener valores seleccionados
+  const qty       = parseInt(document.getElementById('quantity').value, 10);
+  const tipoPapel = document.getElementById('paper-type-input').value;
+  const tipoBorde = document.getElementById('border-type-input').value;
+
+  // 2) Leer el producto guardado al entrar en la página
+  const prod = JSON.parse(localStorage.getItem('selectedProduct') || '{}');
+  if (!prod.id) return alert('No se encontró el producto.');
+
+  // 3) Armar objeto idéntico al que ya usás, más papel y borde
+  const item = {
+    id:         prod.id,
+    nombre:     prod.nombre,
+    precio:     prod.precio,
+    urlImagen:  prod.urlImagen,
+    tipo:       prod.tipo,
+    categoria:  prod.categoria,
+    qty,                // cantidad
+    tipoPapel,          // nuevo campo
+    tipoBorde           // nuevo campo
+  };
+
+  // 4) Agregar al carrito
+  addToCart(prod.id, item);
+});
+
+document.getElementById('btn-buy-now').addEventListener('click', () => {
+  // 1) Obtener valores seleccionados
+  const qty       = parseInt(document.getElementById('quantity').value, 10);
+  const tipoPapel = document.getElementById('paper-type-input').value;
+  const tipoBorde = document.getElementById('border-type-input').value;
+
+  // 2) Leer producto
+  const prod = JSON.parse(localStorage.getItem('selectedProduct') || '{}');
+  if (!prod.id) return alert('No se encontró el producto.');
+
+  // 3) Limpiar carrito actual y crear uno nuevo con este item
+  const singleItem = {
+    id:         prod.id,
+    nombre:     prod.nombre,
+    precio:     prod.precio,
+    urlImagen:  prod.urlImagen,
+    tipo:       prod.tipo,
+    categoria:  prod.categoria,
+    qty,
+    tipoPapel,
+    tipoBorde
+  };
+  localStorage.setItem('cart', JSON.stringify({ [prod.id]: singleItem }));
+
+  // 4) Redirigir al proceso de finalización
+  window.location.href = '../proceso/finalizar.html';
+});
+
+
+// — Listeners de apertura/cierre drawer — 
+document.getElementById('cart-toggle')
+  .addEventListener('click', () => {
+    document.getElementById('cart-drawer').classList.add('open');
+    updateCartBadge();
+    renderCartOverlay();
+  });
+document.getElementById('cart-close')
+  .addEventListener('click', () => {
+    document.getElementById('cart-drawer').classList.remove('open');
+  });
+
+// ————————————————
+// 6) CARGAR “VISTOS TAMBIÉN” ALEATORIOS
+// ————————————————
+async function cargarRelated() {
+  const snapshot = await getDocs(collection(db, 'productos'));
+  const docs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+  // shuffle con Fisher–Yates
+  for (let i = docs.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [docs[i], docs[j]] = [docs[j], docs[i]];
+  }
+  const selected = docs.slice(0, 4);
+  const grid = document.getElementById('carousel-grid');
+  selected.forEach(prod => {
+    const card = document.createElement('div');
+    card.className = 'carousel-card';
+    card.innerHTML = `
+      <img src="${prod.urlImagen}" alt="${prod.nombre}" />
+      <div class="card-content">
+        <h4>${prod.nombre}</h4>
+        <div class="price">$ ${Number(prod.precio).toLocaleString('es-AR')}</div>
+        <a href="/screens/detalle/detalleproducto.html" class="btn-see">Ver detalle</a>
+      </div>
+    `;
+    // al clickear “Ver detalle”
+    card.querySelector('.btn-see').addEventListener('click', () => {
+      localStorage.setItem('selectedProduct', JSON.stringify({
+        id: prod.id,
+        nombre: prod.nombre,
+        precio: prod.precio,
+        urlImagen: prod.urlImagen,
+        tipo: prod.tipo,
+        categoria: prod.categoria
+      }));
+    });
+    grid.appendChild(card);
+  });
+}
+async function cargarDescripcionProducto(id) {
+  const db = window.db;
+  const docRef = doc(db, "productos", id);
+  const docSnap = await getDoc(docRef);
+  if (docSnap.exists()) {
+    const data = docSnap.data();
+    if (data.descripcion) {
+      document.getElementById("product-description-short").textContent = data.descripcion;
+    }
+  } else {
+    console.warn("No se encontró la descripción en Firestore para", id);
+  }
+}
+
+// — Inicialización al cargar la página — 
+document.addEventListener('DOMContentLoaded', () => {
+    // 👉 Cargo datos del producto guardado en la card
+    const prod = JSON.parse(localStorage.getItem('selectedProduct') || '{}');
+    if (prod.nombre) {
+      // Actualizo título
+      document.getElementById('product-title').textContent = prod.nombre;
+      // Actualizo precio
+      document.getElementById('product-price').textContent = `$ ${Number(prod.precio).toLocaleString('es-AR')}`;
+      // Actualizo imagen principal
+      const imgEl = document.getElementById('main-image');
+      imgEl.src = prod.urlImagen;
+      imgEl.alt = prod.nombre;
+      // Actualizo breadcrumb
+      document.getElementById('breadcrumb-product').textContent = prod.nombre;
+      cargarDescripcionProducto(prod.id);
+    }
+    if (prod.precio) {
+      const installmentAmount = (Number(prod.precio) / 6).toFixed(2);
+      document.querySelector('.installments').textContent =
+        `en 6 cuotas de $${Number(installmentAmount).toLocaleString('es-AR')}`;
+    }
+    
+  updateCartBadge();
+  renderCartOverlay();
+});
+
+</script>
+  <!-- ============================
+        FOOTER
+  ============================ -->
+  <footer>
+    <div class="footer-container">
+      <div class="footer-col">
+        <h4>Sobre Nosotros</h4>
+        <ul>
+          <li><a href="about.html">Nuestra Historia</a></li>
+          <li><a href="blog.html">Blog / Noticias</a></li>
+          <li><a href="faq.html">Preguntas Frecuentes</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Categorías</h4>
+        <ul>
+          <li><a href="categories.html?cat=foto">Foto</a></li>
+          <li><a href="categories.html?cat=banner">Banner</a></li>
+          <li><a href="categories.html?cat=accesorios">Accesorios</a></li>
+          <li><a href="categories.html?cat=lona">Lona</a></li>
+          <li><a href="categories.html?cat=digital">Digital</a></li>
+          <li><a href="categories.html?cat=servicio">Servicios</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Atención al Cliente</h4>
+        <ul>
+          <li><a href="contact.html">Contáctanos</a></li>
+          <li><a href="policies.html">Políticas de Privacidad</a></li>
+          <li><a href="returns.html">Devoluciones</a></li>
+          <li><a href="shipping.html">Envíos</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Síguenos</h4>
+        <div class="social-icons">
+          <a href="#" target="_blank"><i class="fab fa-facebook-square"></i></a>
+          <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+          <a href="#" target="_blank"><i class="fab fa-whatsapp-square"></i></a>
+          <a href="#" target="_blank"><i class="fab fa-youtube-square"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; 2025 Laboratorio Fotografico | Francis Color. Todos los derechos reservados.
+    </div>
+  </footer>
+
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+  import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+  // --- Firebase Config
+  const firebaseConfig = {
+     apiKey: "AIzaSyBWrYvbvTEhX_ZGswZEtfOUBhCJ34wp92M",
+  authDomain: "francisfotografia-a8ec2.firebaseapp.com",
+  projectId: "francisfotografia-a8ec2",
+  storageBucket: "francisfotografia-a8ec2.firebasestorage.app",
+  messagingSenderId: "372558145730",
+  appId: "1:372558145730:web:f2f33f67ab7175723c335b"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // Función para obtener descripción
+  async function cargarDescripcionProducto(id) {
+    const docRef = doc(db, "productos", id);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      if (data.descripcion) {
+        document.getElementById("product-description-short").textContent = data.descripcion;
+      }
+    } else {
+      console.warn("No se encontró el documento en Firestore:", id);
+    }
+  }
+
+  // Funciones de carrito
+  function getCart() {
+    const raw = localStorage.getItem('cart');
+    return raw ? JSON.parse(raw) : {};
+  }
+  function saveCart(cart) {
+    localStorage.setItem('cart', JSON.stringify(cart));
+  }
+  function updateCartBadge() {
+    const total = Object.values(getCart()).reduce((sum, i) => sum + i.qty, 0);
+    document.getElementById('cart-badge').textContent = total;
+  }
+  function renderCartOverlay() {
+    const cart = getCart();
+    const container = document.getElementById('cart-items');
+    if (!container) return;
+    if (!Object.keys(cart).length) {
+      container.innerHTML = '<p style="text-align:center; padding:1rem">Tu carrito está vacío</p>';
+      return;
+    }
+    container.innerHTML = Object.entries(cart).map(([id, item]) => `
+      <div class="cart-item">
+        <img src="${item.urlImagen}" alt="${item.nombre}">
+        <div class="details">
+          <p class="name">${item.nombre}</p>
+          <p class="qty-price">${item.qty} x $${Number(item.precio).toLocaleString('es-AR')}</p>
+        </div>
+      </div>
+    `).join('');
+  }
+  function addToCart(id, data) {
+    const cart = getCart();
+    if (cart[id]) {
+      cart[id].qty += data.qty;
+    } else {
+      cart[id] = data;
+    }
+    saveCart(cart);
+    updateCartBadge();
+    renderCartOverlay();
+  }
+
+  // Eventos principales
+  document.addEventListener('DOMContentLoaded', async () => {
+    const prod = JSON.parse(localStorage.getItem('selectedProduct') || '{}');
+    if (prod.id) {
+      document.getElementById('product-title').textContent = prod.nombre;
+      document.getElementById('product-price').textContent = `$ ${Number(prod.precio).toLocaleString('es-AR')}`;
+      document.getElementById('main-image').src = prod.urlImagen;
+      document.getElementById('main-image').alt = prod.nombre;
+      document.getElementById('breadcrumb-product').textContent = prod.nombre;
+
+      await cargarDescripcionProducto(prod.id);
+    }
+
+    updateCartBadge();
+    renderCartOverlay();
+
+    // Drawer carrito
+    document.getElementById('cart-toggle').addEventListener('click', () => {
+      document.getElementById('cart-drawer').classList.add('open');
+      renderCartOverlay();
+    });
+    document.getElementById('cart-close').addEventListener('click', () => {
+      document.getElementById('cart-drawer').classList.remove('open');
+    });
+
+    // Descripción expandible
+    document.getElementById('btn-toggle-desc').addEventListener('click', function () {
+      const longDesc = document.getElementById('description-long');
+      const isHidden = getComputedStyle(longDesc).display === 'none';
+      if (isHidden) {
+        longDesc.style.display = 'block';
+        this.classList.add('expanded');
+        this.innerHTML = 'Ver menos <i class="fas fa-chevron-up"></i>';
+      } else {
+        longDesc.style.display = 'none';
+        this.classList.remove('expanded');
+        this.innerHTML = 'Ver descripción completa <i class="fas fa-chevron-down"></i>';
+      }
+    });
+  });
+
+  // Botón agregar al carrito
+  document.getElementById('btn-add-cart').addEventListener('click', () => {
+    const qty       = parseInt(document.getElementById('quantity').value, 10);
+    const tipoPapel = document.getElementById('paper-type-input').value;
+    const tipoBorde = document.getElementById('border-type-input').value;
+    const prod = JSON.parse(localStorage.getItem('selectedProduct') || '{}');
+    if (!prod.id) return alert('No se encontró el producto.');
+    const item = { ...prod, qty, tipoPapel, tipoBorde };
+    addToCart(prod.id, item);
+  });
+
+  // Botón comprar ahora
+  document.getElementById('btn-buy-now').addEventListener('click', () => {
+    const qty       = parseInt(document.getElementById('quantity').value, 10);
+    const tipoPapel = document.getElementById('paper-type-input').value;
+    const tipoBorde = document.getElementById('border-type-input').value;
+    const prod = JSON.parse(localStorage.getItem('selectedProduct') || '{}');
+    if (!prod.id) return alert('No se encontró el producto.');
+    const item = { ...prod, qty, tipoPapel, tipoBorde };
+    localStorage.setItem('cart', JSON.stringify({ [prod.id]: item }));
+    window.location.href = '../proceso/finalizar.html';
+  });
+
+</script>
+
+</body>

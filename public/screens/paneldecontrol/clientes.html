@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin • Clientes Ultra Pro</title>
+
+  <!-- Google Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+    rel="stylesheet"/>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    crossorigin="anonymous"
+  />
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Firebase SDK -->
+  <script type="module" src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"></script>
+
+  <!-- Global CSS -->
+  <link href="global.css" rel="stylesheet"/>
+
+  <style>
+    /* ----------------------------------------
+       Page-specific overrides
+    ---------------------------------------- */
+    .topbar .actions { gap: 1.5rem; }
+    .stats {
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+      gap:1rem;
+      margin-bottom:2rem;
+    }
+    .stat-card {
+      background:#fff; border-radius:var(--radius);
+      padding:1rem 1.5rem; box-shadow:0 2px 6px rgba(0,0,0,0.05);
+      display:flex; align-items:center; gap:1rem;
+      transition:transform 0.2s, box-shadow 0.2s;
+    }
+    .stat-card:hover {
+      transform: translateY(-3px);
+      box-shadow:0 4px 12px rgba(0,0,0,0.08);
+    }
+    .stat-card i {
+      font-size:2rem; color:var(--accent);
+      width:40px; text-align:center;
+    }
+    .stat-details h4 {
+      font-size:1rem; margin-bottom:0.25rem; color:var(--primary);
+    }
+    .stat-details p {
+      font-size:1.5rem; font-weight:600; color:var(--text);
+    }
+    .filter-bar {
+      display:flex; flex-wrap:wrap; gap:1rem; margin-bottom:1.5rem;
+      align-items:center;
+    }
+    .filter-bar input[type="search"] {
+      flex:1; padding:0.5rem 1rem; border:1px solid #d1d5db;
+      border-radius:var(--radius); transition:border-color 0.2s;
+    }
+    .filter-bar select {
+      padding:0.5rem; border:1px solid #d1d5db; border-radius:var(--radius);
+    }
+    .table-container {
+      background:#fff; border-radius:var(--radius);
+      box-shadow:0 2px 6px rgba(0,0,0,0.05); overflow:auto;
+    }
+    .table-container table {
+      width:100%; border-collapse:collapse; min-width:800px;
+    }
+    .table-container th, .table-container td {
+      padding:0.75rem 1rem; border-bottom:1px solid #e5e7eb;
+    }
+    .table-container th {
+      background:var(--primary); color:#fff; position:sticky; top:0;
+    }
+    .table-container tbody tr:hover {
+      background:#f9fafb;
+    }
+    .pagination {
+      display:flex; justify-content:flex-end; gap:0.5rem; margin-top:1rem;
+    }
+    .pagination button {
+      padding:0.4rem 0.75rem; border:1px solid #d1d5db;
+      background:#fff; border-radius:var(--radius); cursor:pointer;
+      transition:background 0.2s;
+    }
+    .pagination button.active,
+    .pagination button:hover {
+      background:var(--accent); color:#fff; border-color:var(--accent);
+    }
+    .chart-wrapper {
+      background:#fff; border-radius:var(--radius);
+      box-shadow:0 2px 6px rgba(0,0,0,0.05); padding:1rem;
+      margin-bottom:2rem;
+    }
+    .chart-wrapper h4 {
+      margin-bottom:1rem; font-size:1.1rem;
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <h2>Admin Ultra</h2>
+    <nav>
+      <a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+      <a href="clientes.html" class="active"><i class="fas fa-users"></i> Clientes</a>
+      <a href="productos.html"><i class="fas fa-box-open"></i> Productos</a>
+      <a href="pedidos.html"><i class="fas fa-shopping-cart"></i> Pedidos</a>
+      <a href="configuracion.html"><i class="fas fa-cog"></i> Configuración</a>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <button class="btn-menu" onclick="toggleSidebar()">☰</button>
+      <h1>Clientes</h1>
+      <div class="actions">
+        <div class="icon-btn"><i class="fas fa-search"></i></div>
+        <div class="icon-btn"><i class="fas fa-bell"></i><span class="badge" id="notif-count">3</span></div>
+        <div class="icon-btn"><i class="fas fa-user-circle"></i></div>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="content">
+      <!-- Statistics Cards -->
+      <div class="stats">
+        <div class="stat-card">
+          <i class="fas fa-users"></i>
+          <div class="stat-details">
+            <h4>Total Clientes</h4>
+            <p id="stat-total-clientes">Cargando...</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <i class="fas fa-user-plus"></i>
+          <div class="stat-details">
+            <h4>Alta Semana</h4>
+            <p id="stat-semana-clientes">Cargando...</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <i class="fas fa-chart-line"></i>
+          <div class="stat-details">
+            <h4>Crecimiento Mensual</h4>
+            <p id="stat-mes-clientes">Cargando...</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <i class="fas fa-envelope"></i>
+          <div class="stat-details">
+            <h4>Newsletter</h4>
+            <p id="stat-newsletter">Cargando...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Registration Trend Chart -->
+      <div class="chart-wrapper">
+        <h4>Registro de Clientes (últimos 30 días)</h4>
+        <canvas id="chart-clientes-trend" height="100"></canvas>
+      </div>
+
+      <!-- Filter & Search -->
+      <div class="filter-bar">
+        <input type="search" id="search-input" placeholder="Buscar cliente por nombre o email..."/>
+        <select id="filter-status">
+          <option value="">Todos los Estados</option>
+          <option value="activo">Activo</option>
+          <option value="inactivo">Inactivo</option>
+        </select>
+        <button class="btn" onclick="openNewClientForm()"><i class="fas fa-user-plus"></i> Nuevo Cliente</button>
+      </div>
+
+      <!-- Clients Table -->
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Email</th>
+              <th>DNI</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="clients-body">
+            <!-- JS llenará filas -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination" id="pagination">
+        <!-- JS generará botones -->
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- New Client Modal -->
+<div id="client-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6);">
+  <div style="background:#fff; border-radius:var(--radius); max-width:400px; margin:5% auto; padding:2rem; position:relative;">
+    <button onclick="closeNewClientForm()" style="position:absolute; top:1rem; right:1rem; font-size:1.25rem; background:none; border:none;">×</button>
+    <h3>Nuevo Cliente</h3>
+    <div class="form-control"><label>Nombre</label><input id="nuevo-nombre"/></div>
+    <div class="form-control"><label>Email</label><input id="nuevo-email" type="email"/></div>
+    <div class="form-control"><label>Estado</label>
+      <select id="nuevo-estado">
+        <option value="activo">Activo</option>
+        <option value="inactivo">Inactivo</option>
+      </select>
+    </div>
+    <button class="btn" onclick="saveNewClient()">Guardar</button>
+  </div>
+</div>
+
+<script>
+  function toggleSidebar(){
+    document.getElementById('sidebar').classList.toggle('open');
+  }
+  function openNewClientForm(){
+    document.getElementById('client-modal').style.display = 'block';
+  }
+  function closeNewClientForm(){
+    document.getElementById('client-modal').style.display = 'none';
+  }
+</script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+  import {
+    getFirestore, collection, getDocs, addDoc,
+    query, where, orderBy, limit, startAfter
+  } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+  // Configuración Firebase
+  const firebaseConfig = {
+     apiKey: "AIzaSyBWrYvbvTEhX_ZGswZEtfOUBhCJ34wp92M",
+  authDomain: "francisfotografia-a8ec2.firebaseapp.com",
+  projectId: "francisfotografia-a8ec2",
+  storageBucket: "francisfotografia-a8ec2.firebasestorage.app",
+  messagingSenderId: "372558145730",
+  appId: "1:372558145730:web:f2f33f67ab7175723c335b"
+  };
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const clientsCol = collection(db, "clientes");
+
+  // State for pagination
+  let lastDoc = null;
+  const pageSize = 10;
+
+  // Load summary stats
+  async function loadStats() {
+    const all = await getDocs(clientsCol);
+    const total = all.size;
+    document.getElementById('stat-total-clientes').textContent = total;
+
+    // Simulated weekly/monthly/newsletter counts
+    document.getElementById('stat-semana-clientes').textContent = Math.floor(total*0.1);
+    document.getElementById('stat-mes-clientes').textContent = Math.floor(total*0.35);
+    document.getElementById('stat-newsletter').textContent = Math.floor(total*0.5);
+  }
+
+  // Render registration trend
+  function renderTrendChart() {
+    const labels = [], data = [];
+    for(let i=29;i>=0;i--){
+      const d = new Date(); d.setDate(d.getDate()-i);
+      labels.push(d.toLocaleDateString('es-AR',{day:'numeric',month:'short'}));
+      data.push(Math.floor(Math.random()*5)+1);
+    }
+    new Chart(document.getElementById('chart-clientes-trend').getContext('2d'), {
+      type:'line',
+      data:{ labels, datasets:[{ data, borderColor:'#3b82f6', fill:false }]},
+      options:{ plugins:{legend:{display:false}}, scales:{x:{display:false}} }
+    });
+  }
+
+  // Load client table page
+  async function loadClientsPage(direction = 'next') {
+  let q;
+  if (direction === 'next' && lastDoc) {
+    q = query(clientsCol, orderBy("nombre", "asc"), startAfter(lastDoc), limit(pageSize));
+  } else {
+    lastDoc = null;
+    q = query(clientsCol, orderBy("nombre", "asc"), limit(pageSize));
+  }
+
+  const snap = await getDocs(q);
+  const tbody = document.getElementById('clients-body');
+  tbody.innerHTML = '';
+
+  snap.forEach(doc => {
+    lastDoc = doc;
+    const d = doc.data();
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${d.nombre || '—'}</td>
+      <td>${d.correo || '—'}</td>
+      <td>${d.dni || '—'}</td>
+      <td>Activo</td>
+      <td>
+        <button onclick="editClient('${doc.id}')"><i class="fas fa-edit"></i></button>
+        <button onclick="deleteClient('${doc.id}')"><i class="fas fa-trash-alt" style="color:#ef4444;"></i></button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  renderPagination();
+}
+
+
+  // Pagination controls
+  function renderPagination(){
+    const pg = document.getElementById('pagination');
+    pg.innerHTML = '';
+    const prevBtn = document.createElement('button');
+    prevBtn.textContent='Anterior'; prevBtn.onclick=()=>loadClientsPage('prev');
+    const nextBtn = document.createElement('button');
+    nextBtn.textContent='Siguiente'; nextBtn.onclick=()=>loadClientsPage('next');
+    pg.append(prevBtn,nextBtn);
+  }
+
+  // New client form
+  async function saveNewClient(){
+    const nombre=document.getElementById('nuevo-nombre').value;
+    const email =document.getElementById('nuevo-email').value;
+    const estado=document.getElementById('nuevo-estado').value;
+    await addDoc(clientsCol,{ nombre, email, estado, registro:new Date() });
+    closeNewClientForm();
+    loadClientsPage();
+    loadStats();
+  }
+
+  // Placeholder edit/delete
+  function editClient(id){ alert('Editar '+id); }
+  function deleteClient(id){ alert('Eliminar '+id); }
+
+  // Init
+  document.addEventListener('DOMContentLoaded',()=>{
+    loadStats();
+    renderTrendChart();
+    loadClientsPage();
+  });
+</script>
+</body>
+</html>

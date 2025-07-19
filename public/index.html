@@ -1,0 +1,1686 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Laboratorio Fotografico | Francis Color</title>
+
+  <!-- Fuente Roboto -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+    rel="stylesheet"
+  />
+  <!-- Splide CSS -->
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.3/dist/css/splide.min.css"
+/>
+
+
+  <!-- FontAwesome Iconos -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    integrity="sha512-pzo9U8ixRRTl+lyx8kkz+YMDpao+fKlW+OxyVd09O8Qzs165b7eOMPIHz4Lm/KmPdvfI9e5YXA+ybxILgY7kqw=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+
+  <!-- Estilos principales -->
+  <style>
+    /* ----------------------------------------------------------
+      VARIABLES GLOBALES
+    ---------------------------------------------------------- */
+    :root {
+      --color-primario: #111;             /* Negro profundo */
+      --color-secundario: #f0c040;        /* Dorado brillante */
+      --color-fondo: #f5f5f5;             /* Gris muy claro */
+      --color-texto: #333;                /* Gris oscuro para texto */
+      --color-texto-claro: #fff;          /* Blanco puro */
+      --border-radius: 8px;
+      --transition-fast: 0.2s ease;
+      --font-base: 'Roboto', sans-serif;
+      --max-width: 1200px;
+    }
+
+    /* ----------------------------------------------------------
+      RESET BÁSICO
+    ---------------------------------------------------------- */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html {
+      font-family: var(--font-base);
+      scroll-behavior: smooth;
+    }
+    body {
+      background-color: var(--color-fondo);
+      color: var(--color-texto);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+    img {
+      max-width: 100%;
+      display: block;
+    }
+    button {
+      cursor: pointer;
+      font-family: var(--font-base);
+      border: none;
+      background: none;
+    }
+
+    /* ----------------------------------------------------------
+      NAVBAR
+    ---------------------------------------------------------- */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2rem;
+      max-width: var(--max-width);
+      margin: 0 auto;
+    }
+    .navbar .logo a {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--color-texto-claro);
+      letter-spacing: 1px;
+    }
+    .navbar nav ul {
+      display: flex;
+      list-style: none;
+      align-items: center;
+    }
+    .navbar nav ul li {
+      margin-left: 1.5rem;
+    }
+    .navbar nav ul li a {
+      color: var(--color-texto-claro);
+      font-weight: 500;
+      font-size: 0.95rem;
+      padding: 0.25rem 0.5rem;
+      transition: color var(--transition-fast);
+    }
+    .navbar nav ul li a:hover {
+      color: var(--color-secundario);
+    }
+    .navbar .btn-cart {
+      background-color: var(--color-secundario);
+      color: var(--color-primario);
+      padding: 0.5rem 0.9rem;
+      border-radius: var(--border-radius);
+      font-weight: 500;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      transition: background-color var(--transition-fast);
+    }
+    .navbar .btn-cart:hover {
+      background-color: #ddb732;
+    }
+
+    /* navbar transparente vs scroll */
+    .navbar-transparent {
+      background: transparent;
+      box-shadow: none;
+    }
+    .navbar-scrolled {
+      background: rgba(0, 0, 0, 0.85);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    /* ----------------------------------------------------------
+      SLIDER PRINCIPAL (HERO)
+    ---------------------------------------------------------- */
+    .slider-container {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
+    }
+    .slide.active {
+      opacity: 1;
+      z-index: 1;
+    }
+    .slider-overlay {
+      position: absolute;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.4);
+      z-index: 1;
+    }
+    .slider-content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      height: 100%;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: var(--color-texto-claro);
+      flex-direction: column;
+      padding: 0 1rem;
+    }
+    .slider-content h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      animation: fadeInDown 1s ease both;
+    }
+    .slider-content p {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+      opacity: 0.9;
+      animation: fadeInUp 1s ease both 0.5s;
+    }
+    .slider-buttons {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 1rem;
+      z-index: 2;
+    }
+    .slider-buttons button {
+      width: 15px;
+      height: 15px;
+      background-color: rgba(255, 255, 255, 0.6);
+      border-radius: 50%;
+      border: 2px solid var(--color-texto-claro);
+      transition: background-color var(--transition-fast);
+    }
+    .slider-buttons button.active {
+      background-color: var(--color-secundario);
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ----------------------------------------------------------
+      SECCIONES INTERMEDIAS
+    ---------------------------------------------------------- */
+    .section {
+      padding: 4rem 2rem;
+      position: relative;
+      max-width: var(--max-width);
+      margin: 0 auto;
+    }
+    .section h2 {
+      text-align: center;
+      font-size: 2.25rem;
+      margin-bottom: 2rem;
+      font-weight: 700;
+      position: relative;
+      display: inline-block;
+      color: var(--color-primario);
+    }
+    .section h2::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 4px;
+      background-color: var(--color-secundario);
+      border-radius: 2px;
+    }
+
+    /* Loader */
+    .loader {
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid var(--color-secundario);
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 4rem auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* ----------------------------------------------------------
+      GRID DE TIPO CATEGORÍAS
+    ---------------------------------------------------------- */
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+    .category-card {
+      background-color: var(--color-texto-claro);
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      transition: transform 0.3s, box-shadow 0.3s;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.5rem 1rem;
+      min-height: 180px;
+    }
+    .category-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+    }
+    .category-card i {
+      font-size: 2.5rem;
+      color: var(--color-secundario);
+      margin-bottom: 0.75rem;
+    }
+    .category-card h3 {
+      font-size: 1.25rem;
+      font-weight: 500;
+      color: var(--color-primario);
+    }
+
+    /* ----------------------------------------------------------
+      GRID DE PRODUCTOS (GENÉRICO)
+    ---------------------------------------------------------- */
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 2rem;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+    .products-grid.visible {
+      opacity: 1;
+    }
+    .product-card {
+      background-color: var(--color-texto-claro);
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s, box-shadow 0.3s;
+      display: flex;
+      flex-direction: column;
+    }
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+    }
+    .product-card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      transition: transform 0.3s;
+    }
+    .product-card:hover img {
+      transform: scale(1.05);
+    }
+    .product-card .card-content {
+      flex: 1;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+    }
+    .product-card .card-content h3 {
+      font-size: 1.15rem;
+      margin-bottom: 0.5rem;
+      color: var(--color-primario);
+      font-weight: 500;
+      flex: 1;
+    }
+    .product-card .card-content p {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 0.5rem;
+      flex: 1;
+    }
+    .product-card .card-content .price {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--color-secundario);
+      margin-bottom: 0.75rem;
+    }
+    .product-card .card-content .btn-add {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--color-primario);
+      color: var(--color-texto-claro);
+      padding: 0.5rem 1rem;
+      border-radius: var(--border-radius);
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: background-color var(--transition-fast);
+      margin-top: auto;
+    }
+    .product-card .card-content .btn-add i {
+      margin-left: 0.5rem;
+    }
+    .product-card .card-content .btn-add:hover {
+      background-color: #333;
+    }
+
+    /* ----------------------------------------------------------
+      SECCIÓN ABOUT US
+    ---------------------------------------------------------- */
+    .about-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      align-items: center;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+    .about-text {
+      flex: 1 1 400px;
+      font-size: 1rem;
+      line-height: 1.6;
+      color: #444;
+    }
+    .about-image {
+      flex: 1 1 400px;
+      max-width: 500px;
+    }
+    .about-image img {
+      border-radius: var(--border-radius);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    /* ----------------------------------------------------------
+      FOOTER
+    ---------------------------------------------------------- */
+    footer {
+      background-color: #222;
+      color: #ccc;
+      padding: 3rem 2rem 1rem;
+    }
+    .footer-container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+    .footer-col {
+      flex: 1 1 220px;
+      margin-bottom: 2rem;
+    }
+    .footer-col h4 {
+      color: var(--color-texto-claro);
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    .footer-col ul {
+      list-style: none;
+    }
+    .footer-col ul li {
+      margin-bottom: 0.6rem;
+    }
+    .footer-col ul li a {
+      color: #ccc;
+      font-size: 0.9rem;
+      transition: color var(--transition-fast);
+    }
+    .footer-col ul li a:hover {
+      color: var(--color-secundario);
+    }
+    .social-icons {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+    }
+    .social-icons a {
+      color: #ccc;
+      font-size: 1.3rem;
+      transition: color var(--transition-fast);
+    }
+    .social-icons a:hover {
+      color: var(--color-secundario);
+    }
+    .footer-bottom {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 0.85rem;
+      color: #777;
+    }
+
+    /* ----------------------------------------------------------
+      ESTILOS RESPONSIVOS
+    ---------------------------------------------------------- */
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 0.75rem 1.5rem;
+      }
+      .slider-content h1 {
+        font-size: 2.4rem;
+      }
+      .slider-content p {
+        font-size: 1rem;
+      }
+      .about-container {
+        flex-direction: column-reverse;
+      }
+      .about-image, .about-text {
+        flex: 1 1 100%;
+      }
+    }
+    /* ----------------------------------------------------------
+      BENEFITS CAROUSEL
+    ---------------------------------------------------------- */
+    .benefits-section {
+      background-color: #fff;
+      padding: 3rem 1rem 1rem;
+      text-align: center;
+    }
+    .benefits-section h2 {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      color: var(--color-secundario);
+    }
+    .benefits-carousel-container {
+      position: relative;
+      overflow: hidden;
+      max-width: var(--max-width);
+      margin: 0 auto;
+    }
+    .benefits-carousel {
+      display: flex;
+      gap: 1rem;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      padding: 1rem;
+    }
+    .benefits-carousel::-webkit-scrollbar {
+      display: none;
+    }
+    .benefit-slide {
+      position: relative;
+      flex: 0 0 250px;
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      box-shadow: 0 4px 8px var(--shadow-light);
+    }
+    .benefit-slide img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+    }
+    .benefit-caption {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      color: #fff;
+      padding: 0.75rem;
+      font-size: 0.95rem;
+      font-weight: 500;
+      line-height: 1.2;
+    }
+    .benefits-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: rgba(255,255,255,0.9);
+      border: 1px solid var(--color-borde);
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color var(--transition-fast);
+      z-index: 10;
+    }
+    .benefits-arrow:hover {
+      background-color: #fff;
+    }
+    .benefits-arrow.left {
+      left: 5px;
+    }
+    .benefits-arrow.right {
+      right: 5px;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .benefit-slide {
+        flex: 0 0 200px;
+      }
+      .benefits-arrow {
+        display: none;
+      }
+    }
+    /* Contenedor de botones apilados */
+    .card-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      margin-top: 1rem;
+    }
+
+    /* Botón secundario */
+    .btn-cart {
+      background-color: #e0e0e0;
+      color: #333;
+      padding: 0.6rem 1rem;
+      border-radius: 5px;
+      font-weight: 500;
+      transition: background 0.2s;
+    }
+    .btn-cart:hover {
+      background-color: #ccc;
+    }
+
+    /* Botón primario más destacado */
+    .btn-buy {
+      background-color: var(--color-primario);
+      color: #fff;
+      padding: 0.8rem 1rem;
+      border-radius: 5px;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+    .btn-buy:hover {
+      background-color: #c19a2a;
+    }
+
+  </style>
+</head>
+<body>
+  <!-- ============================
+        HEADER / NAVBAR
+  ============================ -->
+  <!-- ============================
+     HEADER ULTRA PRO
+============================ -->
+<header class="header">
+  <div class="header__container">
+    <a href="index.html" class="header__logo">Laboratorio Fotografico | Francis Color</a>
+
+    <nav class="header__nav" id="main-nav">
+      <ul class="nav__list">
+        <li class="nav__item"><a href="#slider"            class="nav__link">Inicio</a></li>
+      </ul>
+    </nav>
+
+    <div class="header__actions">
+      <a href="cart.html" class="btn btn--cart">
+        <i class="fas fa-shopping-cart"></i>&nbsp;Carrito
+      </a>
+      <button class="header__toggle" id="nav-toggle" aria-label="Abrir menú">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<style>
+  /* ----------------------------------------------------------
+     VARIABLES
+  ---------------------------------------------------------- */
+  :root {
+    --color-primario: #111;
+    --color-secundario: #f0c040;
+    --color-fondo-nav: rgba(255, 255, 255, 0.411);
+    --font-base: 'Roboto', sans-serif;
+    --transition-fast: 0.2s ease;
+    --border-radius: 6px;
+    --max-width: 1200px;
+  }
+
+  /* ----------------------------------------------------------
+     RESET BÁSICO
+  ---------------------------------------------------------- */
+  header, nav, ul, li, a, button {
+    margin: 0; padding: 0; border: none; background: none;
+    font-family: var(--font-base);
+  }
+  ul { list-style: none; }
+  a { text-decoration: none; color: inherit; }
+
+  /* ----------------------------------------------------------
+     HEADER
+  ---------------------------------------------------------- */
+  .header {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    backdrop-filter: blur(10px);
+    background-color: var(--color-fondo-nav);
+    z-index: 999;
+    transition: background-color 0.3s ease;
+  }
+  .header__container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+  }
+  .header__logo {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-primario);
+  }
+
+  /* ----------------------------------------------------------
+     NAV DESKTOP
+  ---------------------------------------------------------- */
+  .header__nav .nav__list {
+    display: flex;
+    gap: 1.5rem;
+  }
+  .nav__link {
+    position: relative;
+    font-weight: 500;
+    color: var(--color-primario);
+    padding: 0.25rem;
+    transition: color var(--transition-fast);
+  }
+  .nav__link::after {
+    content: '';
+    position: absolute;
+    left: 0; bottom: -4px;
+    width: 0; height: 2px;
+    background: var(--color-secundario);
+    transition: width var(--transition-fast);
+  }
+  .nav__link:hover {
+    color: var(--color-secundario);
+  }
+  .nav__link:hover::after {
+    width: 100%;
+  }
+
+  /* ----------------------------------------------------------
+     ACCIONES (Carrito + Toggle)
+  ---------------------------------------------------------- */
+  .header__actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .btn--cart {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: var(--color-secundario);
+    color: #fff;
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius);
+    font-weight: 500;
+    transition: background var(--transition-fast);
+  }
+  .btn--cart:hover {
+    background-color: #ddb732;
+  }
+
+  .header__toggle {
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    cursor: pointer;
+  }
+  .header__toggle span {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: var(--color-primario);
+  }
+
+  /* ----------------------------------------------------------
+     NAV MOBILE
+  ---------------------------------------------------------- */
+  @media (max-width: 768px) {
+    .header__nav {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: #fff;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .header__nav.open {
+      max-height: 300px;
+    }
+    .header__nav .nav__list {
+      flex-direction: column;
+      padding: 1rem 2rem;
+      gap: 1rem;
+    }
+    .nav__link {
+      color: var(--color-primario);
+      font-size: 1.1rem;
+    }
+    .header__toggle {
+      display: flex;
+    }
+
+  }
+</style>
+
+<script>
+  // Toggle menú mobile
+  document.getElementById('nav-toggle').addEventListener('click', () => {
+    document.getElementById('main-nav').classList.toggle('open');
+  });
+</script>
+
+
+  <!-- ============================
+        SLIDER PRINCIPAL (HERO)
+  ============================ -->
+  <section id="slider" class="slider-container">
+    <!-- Slide 1 -->
+    <div class="slide active" style="background-image: url('https://difusoribero.com/wp-content/uploads/2015/05/greengo_web_1600x900.jpg');"></div>
+    <!-- Slide 2 -->
+    <div class="slide" style="background-image: url('https://amhigo.com/images/amhiblog/expertos/Luis_Flores_/Foto_portada.jpg');"></div>
+    <!-- Overlay semitransparente -->
+    <div class="slider-overlay"></div>
+    <!-- Contenido encima del slider -->
+    <div class="slider-content">
+      <h1>Laboratorio Fotografico | Francis Color </h1>
+      <p>Servicio profesional de laboratorio fotográfico y suministros especializados.</p>
+      <a href="#products-section" class="btn-hero" style="
+         background-color: var(--color-secundario);
+         color: var(--color-primario);
+         padding: 0.75rem 1.5rem;
+         border-radius: var(--border-radius);
+         font-weight: 600;
+         font-size: 1rem;
+         transition: background-color var(--transition-fast);
+      ">Ver Productos</a>
+    </div>
+    <!-- Botones de navegación del slider -->
+    <div class="slider-buttons">
+      <button data-index="0" class="active"></button>
+      <button data-index="1"></button>
+    </div>
+  </section>
+<!-- ============================
+     SECCIÓN CAROUSEL DE BENEFICIOS
+============================ -->
+<section class="py-4 px-3 bg-white w-100" style="margin-top: 20px;">
+  <div class="container-fluid px-4">
+    <div id="splideBeneficios" class="splide" aria-label="Beneficios destacados">
+      <div class="splide__track">
+        <ul class="splide__list align-items-center">
+          <li class="splide__slide text-center px-3">
+            <a href="#" target="_blank">
+              <img
+                src="https://cyclemotorshopar.vtexassets.com/assets/vtex.file-manager-graphql/images/cd8dfe42-db62-43e0-9790-765203606491___470556d70284e6fc1621dd170e6ada28.png"
+                class="img-fluid"
+                alt="Envío Exprés 24-48h"
+                style="max-height:120px;"
+              >
+            </a>
+            <p class="mt-2">Envío Exprés 24-48h</p>
+          </li>
+          <li class="splide__slide text-center px-3">
+            <a href="#" target="_blank">
+              <img
+                src="https://cyclemotorshopar.vtexassets.com/assets/vtex.file-manager-graphql/images/9bbd0d9a-bd0f-4248-81dc-5bf0f70f542a___564ba7d13bd995b26b44a78327d66a23.png"
+                class="img-fluid"
+                alt="Soporte 24/7"
+                style="max-height:120px;"
+              >
+            </a>
+            <p class="mt-2">Soporte 24/7</p>
+          </li>
+          <li class="splide__slide text-center px-3">
+            <a href="#" target="_blank">
+              <img
+                src="https://cyclemotorshopar.vtexassets.com/assets/vtex.file-manager-graphql/images/a10ce198-59a0-4538-8c5b-1c8de4078b97___42c805713e969db6947fada4da5f0b91.png"
+                class="img-fluid"
+                alt="Garantía Oficial"
+                style="max-height:120px;"
+              >
+            </a>
+            <p class="mt-2">Garantía Oficial</p>
+          </li>
+          <li class="splide__slide text-center px-3">
+            <a href="#" target="_blank">
+              <img
+                src="https://cyclemotorshopar.vtexassets.com/assets/vtex.file-manager-graphql/images/d39b77b7-99c9-498f-8af3-cbf86116a6b1___84524a363d41a5f6f2bf967c2376bebc.png"
+                class="img-fluid"
+                alt="Devolución 30 Días"
+                style="max-height:120px;"
+              >
+            </a>
+            <p class="mt-2">Devolución 30 Días</p>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Splide JS -->
+<script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.3/dist/js/splide.min.js"></script>
+<script>
+  document.addEventListener( 'DOMContentLoaded', function () {
+    new Splide( '#splideBeneficios', {
+      type   : 'loop',
+      perPage: 4,
+      gap    : '1rem',
+      autoplay: true,
+      interval: 4000,
+      pagination: true,
+      breakpoints: {
+        992: { perPage: 3 },
+        768: { perPage: 2 },
+        576: { perPage: 1 }
+      }
+    } ).mount();
+  } );
+</script>
+
+  
+
+
+  
+
+  
+
+  
+
+
+  <!-- ============================
+     SECCIÓN TODOS LOS PRODUCTOS
+============================ -->
+<section id="products-section" class="section">
+  <h2>Todos Nuestros Productos</h2>
+
+  <!-- Loader mientras llegan datos -->
+  <div id="loader-all" class="loader"></div>
+
+  <!-- Carrusel de productos -->
+  <div class="products-carousel-container">
+    <button class="carousel-arrow left" id="all-left">
+      <i class="fas fa-chevron-left"></i>
+    </button>
+    <div class="products-carousel" id="products-carousel">
+      <!-- Aquí se inyectan hasta 10 cards al azar -->
+    </div>
+    <button class="carousel-arrow right" id="all-right">
+      <i class="fas fa-chevron-right"></i>
+    </button>
+  </div>
+</section>
+<style>
+  /* Carrusel horizontal */
+.products-carousel-container {
+  position: relative;
+  max-width: 1200px;
+  margin: 1rem auto;
+  overflow: hidden;
+}
+.products-carousel {
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 1rem 2rem;
+}
+.products-carousel::-webkit-scrollbar {
+  display: none;
+}
+.carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(255,255,255,0.9);
+  border: 1px solid var(--color-borde);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: background-color var(--transition-fast);
+}
+.carousel-arrow:hover {
+  background-color: #fff;
+}
+.carousel-arrow.left {
+  left: 10px;
+}
+.carousel-arrow.right {
+  right: 10px;
+}
+
+</style>
+<!-- ============================
+        SECCIÓN CATEGORÍAS
+  ============================ -->
+  <section id="categories-section" class="section">
+    <h2>Categorías Principales</h2>
+    <div id="categories-grid" class="categories-grid">
+        <!-- Estas tarjetas se inyectan con JS -->
+    </div>
+  </section>
+
+
+  <!-- ============================
+        SECCIÓN QUIÉNES SOMOS (ABOUT US)
+  ============================ -->
+  <section id="about-section" class="section" style="background-color: #f9f9f9;">
+    <h2>Quiénes Somos</h2>
+    <div class="about-container">
+      <div class="about-text">
+        <p>
+          Laboratorio Fotografico | Francis Color  es un laboratorio fotográfico con más de 47 años de experiencia, 
+          especializado en revelados analógicos y digitales de alta calidad. Nuestro objetivo es brindar 
+          soluciones integrales para fotógrafos profesionales y aficionados avanzados: desde simples copias 
+          de impresiones hasta conversiones de video y producción de banners de gran formato.
+        </p>
+        <p>
+          Nos enorgullece usar equipos de última generación que garantizan colores vivos y un revelado impecable. 
+          Contamos con un equipo de especialistas siempre dispuestos a asesorarte en la elección del mejor formato, 
+          papel y acabado, y ofrecemos envíos exprés a todo el país. Además, tenemos stock permanente de productos 
+          de fotografía, accesorios, papeles especiales y materiales para cartelería.
+        </p>
+        <p>
+          Misión: Ser el socio estratégico de los fotógrafos, ofreciendo calidad profesional, tiempos de entrega 
+          ultra rápidos y atención personalizada.  
+          <br />
+          Visión: Liderar el mercado de servicios fotográficos y publicitarios combinando tecnología de punta 
+          con experiencia humana.
+        </p>
+      </div>
+      <div class="about-image">
+        <img src="assets/about.webp" alt="Sobre Laboratorio Fotografico | Francis Color " />
+      </div>
+    </div>
+  </section>
+
+  <!-- ──────────────────────────────────────────────────────────────────── -->
+<!-- 1) ESTILOS DEL BOTÓN FLOTANTE Y EL DRAWER -->
+<style>
+  /* Botón flotante */
+  #cart-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    background: var(--color-primario);
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px var(--shadow-light);
+    cursor: pointer;
+    z-index: 1000;
+  }
+  #cart-toggle .badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: #e74c3c;
+    width: 18px;
+    height: 18px;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+  }
+
+  /* Drawer del carrito */
+  #cart-drawer {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 320px;
+    height: 100%;
+    background: #fff;
+    box-shadow: -4px 0 24px rgba(0,0,0,0.15);
+    transition: right 0.3s ease;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+  }
+  #cart-drawer.open {
+    right: 0;
+  }
+  /* Header */
+  #cart-drawer .drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  #cart-drawer .drawer-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+  }
+  #cart-drawer .close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+  /* Lista de ítems */
+  #cart-items {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+  }
+  .cart-item {
+    display: flex;
+    margin-bottom: 1rem;
+  }
+  .cart-item img {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-right: 0.75rem;
+  }
+  .cart-item .details .name {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+  .cart-item .details .qty-price {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #555;
+  }
+  /* Footer */
+  #cart-drawer .drawer-footer {
+    padding: 1rem;
+    border-top: 1px solid #e0e0e0;
+    text-align: center;
+  }
+  #cart-drawer .checkout-btn {
+    background: var(--color-primario);
+    color: #fff;
+    padding: 0.75rem 1.2rem;
+    border: none;
+    border-radius: var(--border-radius);
+    width: 100%;
+    font-weight: 600;
+    cursor: pointer;
+  }
+</style>
+
+<!-- ──────────────────────────────────────────────────────────────────── -->
+<!-- 2) BOTÓN FLOTANTE Y DRAWER (PÉGALOS EN EL <body>) -->
+<!-- Botón -->
+<div id="cart-toggle">
+  <i class="fas fa-shopping-bag"></i>
+  <span class="badge" id="cart-badge">0</span>
+</div>
+
+<!-- Drawer -->
+<aside id="cart-drawer">
+  <div class="drawer-header">
+    <h3>Tu Carrito</h3>
+    <button class="close-btn" id="cart-close">&times;</button>
+  </div>
+  <div id="cart-items">
+    <!-- Aquí se renderizarán los productos -->
+  </div>
+  <div class="drawer-footer">
+    <button class="checkout-btn" id="checkout-btn">Ir al Checkout</button>
+  </div>
+</aside>
+
+<!-- ──────────────────────────────────────────────────────────────────── -->
+<!-- 3) LÓGICA DE TOGGLE Y RENDERIZADO (PÉGALA DESPUÉS DE TUS FUNCTIONS DE CARRITO) -->
+<script>
+  // Asegúrate de que existan estas funciones: getCart(), updateCartBadge(), renderCartOverlay()
+
+  // Reescribimos renderCartOverlay para que pinte en #cart-items
+  function renderCartOverlay() {
+    const cart = getCart();
+    const container = document.getElementById('cart-items');
+    if (!container) return;
+    if (Object.keys(cart).length === 0) {
+      container.innerHTML = '<p style="text-align:center; padding:1rem">Tu carrito está vacío</p>';
+      return;
+    }
+    container.innerHTML = Object.entries(cart).map(([id, item]) => `
+      <div class="cart-item">
+        <img src="${item.urlImagen}" alt="${item.nombre}">
+        <div class="details">
+          <p class="name">${item.nombre}</p>
+          <p class="qty-price">${item.qty} x $${Number(item.precio).toLocaleString('es-AR')}</p>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Elementos
+  const cartToggle = document.getElementById('cart-toggle');
+  const cartDrawer = document.getElementById('cart-drawer');
+  const cartClose  = document.getElementById('cart-close');
+
+  // Mostrar/ocultar drawer
+  cartToggle.addEventListener('click', () => {
+    cartDrawer.classList.add('open');
+    updateCartBadge();
+    renderCartOverlay();
+  });
+  cartClose.addEventListener('click', () => {
+    cartDrawer.classList.remove('open');
+  });
+
+  // Al iniciar página, actualizamos badge
+  document.addEventListener('DOMContentLoaded', () => {
+    updateCartBadge();
+  });
+</script>
+<!-- ──────────────────────────────────────────────────────────────────── -->
+
+
+  <!-- ============================
+        FOOTER
+  ============================ -->
+  <footer>
+    <div class="footer-container">
+      <div class="footer-col">
+        <h4>Sobre Nosotros</h4>
+        <ul>
+          <li><a href="#about-section">Nuestra Historia</a></li>
+          <li><a href="blog.html">Blog / Noticias</a></li>
+          <li><a href="faq.html">Preguntas Frecuentes</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Categorías</h4>
+        <ul>
+          <li><a href="categories.html?cat=foto">Foto</a></li>
+          <li><a href="categories.html?cat=banner">Banner</a></li>
+          <li><a href="categories.html?cat=lona">Lona</a></li>
+          <li><a href="categories.html?cat=servicio">Servicios</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Atención al Cliente</h4>
+        <ul>
+          <li><a href="contact.html">Contáctanos</a></li>
+          <li><a href="policies.html">Políticas de Privacidad</a></li>
+          <li><a href="returns.html">Devoluciones</a></li>
+          <li><a href="shipping.html">Envíos</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Síguenos</h4>
+        <div class="social-icons">
+          <a href="#" target="_blank"><i class="fab fa-facebook-square"></i></a>
+          <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+          <a href="#" target="_blank"><i class="fab fa-whatsapp-square"></i></a>
+          <a href="#" target="_blank"><i class="fab fa-youtube-square"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; 2025 Laboratorio Fotografico | Francis Color. Todos los derechos reservados.
+    </div>
+  </footer>
+
+  <!-- ============================
+       SCRIPTS DE INTERACCIÓN
+  ============================ -->
+  <!-- 1) Manejo de navbar transparente / scroll -->
+  <script>
+    window.addEventListener('scroll', () => {
+      const navbar = document.getElementById('navbar');
+      if (window.scrollY > 50) {
+        navbar.classList.remove('navbar-transparent');
+        navbar.classList.add('navbar-scrolled');
+      } else {
+        navbar.classList.add('navbar-transparent');
+        navbar.classList.remove('navbar-scrolled');
+      }
+    });
+  </script>
+
+  <!-- 2) Lógica del Slider (JavaScript puro) -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const slides = document.querySelectorAll('.slide');
+      const buttons = document.querySelectorAll('.slider-buttons button');
+      let current = 0;
+
+      function goToSlide(index) {
+        slides[current].classList.remove('active');
+        buttons[current].classList.remove('active');
+        current = (index + slides.length) % slides.length;
+        slides[current].classList.add('active');
+        buttons[current].classList.add('active');
+      }
+
+      // Cambiar automáticamente cada 7 segundos
+      setInterval(() => {
+        goToSlide(current + 1);
+      }, 7000);
+
+      // Al hacer click en botón, cambiar instantáneamente
+      buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const idx = parseInt(btn.getAttribute('data-index'));
+          goToSlide(idx);
+        });
+      });
+    });
+  </script>
+
+  <!-- 3) Firebase App + Firestore (versión modular v9+) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+    // Tu configuración de Firebase (proporcionada)
+    const firebaseConfig = {
+      apiKey: "AIzaSyBWrYvbvTEhX_ZGswZEtfOUBhCJ34wp92M",
+      authDomain: "francisfotografia-a8ec2.firebaseapp.com",
+      projectId: "francisfotografia-a8ec2",
+      storageBucket: "francisfotografia-a8ec2.firebasestorage.app",
+      messagingSenderId: "372558145730",
+      appId: "1:372558145730:web:f2f33f67ab7175723c335b"
+    };
+
+    // Inicializar Firebase y Firestore
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Referencias a colecciones
+    const productosCol = collection(db, "productos");
+
+    // ————————————————————————————————————————————————————————————
+    // 1) CARGAR CATEGORÍAS DESDE PRODUCTOS, CADA UNA CON SU IMAGEN DE FIRESTORE
+    // ————————————————————————————————————————————————————————————
+    async function cargarCategorias() {
+      try {
+        const snapshot = await getDocs(productosCol);
+
+        // 1) Extraer categorías únicas y, al mismo tiempo,
+        //    guardar la primera urlImagen que veamos por categoría
+        const categoriasSet = new Set();
+        const imagenesPorCategoria = {}; // { cat: urlImagen }
+
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          if (!data.categoria) return;
+
+          const cat = data.categoria.toLowerCase();
+          categoriasSet.add(cat);
+
+          // Si aún no tenemos imagen para esta categoría, la asignamos
+          if (!imagenesPorCategoria[cat] && data.urlImagen) {
+            imagenesPorCategoria[cat] = data.urlImagen;
+          }
+        });
+
+        // 2) Ordenar y renderizar
+        const categoriasArray = Array.from(categoriasSet).sort();
+        const grid = document.getElementById("categories-grid");
+
+        categoriasArray.forEach(cat => {
+          // Título capitalizado
+          const title = cat.charAt(0).toUpperCase() + cat.slice(1);
+
+          // Imagen de Firestore ó fallback a icono
+          const urlImg = imagenesPorCategoria[cat] || "";
+          const content = urlImg
+            ? `<div class="category-img">
+                <img src="${urlImg}" alt="${title}">
+              </div>`
+            : `<div class="category-img"><i class="fas fa-folder"></i></div>`;
+
+          // Crear tarjeta
+          const card = document.createElement("div");
+          card.classList.add("category-card");
+          card.innerHTML = `
+            ${content}
+            <h3>${title}</h3>
+          `;
+
+          // Click filtra
+          card.addEventListener("click", () => {
+            window.location.href = `categories.html?cat=${encodeURIComponent(cat)}`;
+          });
+
+          grid.appendChild(card);
+        });
+
+      } catch (error) {
+        console.error("Error cargando categorías:", error);
+      }
+    }
+
+    // Asegúrate de invocar la función al cargar el DOM
+
+
+    // ————————————————————————————————————————————————————————————
+    // 2) CARGAR PRODUCTOS MÁS VENDIDOS (solo 5 al azar, con todos sus datos)
+    // ————————————————————————————————————————————————————————————
+    async function cargarBestSellers() {
+    try {
+        // 1. Obtenemos todos los documentos donde masVendido == true
+        const q = query(productosCol, where("masVendido", "==", true));
+        const snapshot = await getDocs(q);
+
+        // 2. Convertimos los documentos en un array para poder mezclarlos
+        const docsArray = snapshot.docs.slice(); // copia del array de documentos
+
+        // 3. Mezclamos (shuffle) con Fisher-Yates
+        for (let i = docsArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [docsArray[i], docsArray[j]] = [docsArray[j], docsArray[i]];
+        }
+
+        // 4. Tomamos los primeros 5 (o menos si hay menos de 5 en total)
+        const topFive = docsArray.slice(0, 5);
+
+        const grid = document.getElementById("best-sellers-grid");
+        const loader = document.getElementById("loader-best");
+
+        // 5. Para cada doc seleccionado, creamos la card y la agregamos al grid
+        topFive.forEach(doc => {
+        const data = doc.data();
+        const card = crearCardProducto(data, doc.id);
+        grid.appendChild(card);
+        });
+
+        // 6. Ocultamos el loader y mostramos el grid
+        loader.style.display = "none";
+        grid.classList.add("visible");
+
+    } catch (error) {
+        console.error("Error cargando más vendidos:", error);
+        const loader = document.getElementById("loader-best");
+        loader.textContent = "Error al cargar más vendidos.";
+        loader.style.border = "none";
+        loader.style.color = "#c00";
+    }
+    }
+
+    // ————————————————————————————————————————————————————————————
+    // 3) CARGAR 10 PRODUCTOS ALEATORIOS EN CARRUSEL
+    // ————————————————————————————————————————————————————————————
+    async function cargarTodosProductos() {
+      const loader = document.getElementById("loader-all");
+      const carousel = document.getElementById("products-carousel");
+
+      try {
+        // 1) traemos todos los docs
+        const snapshot = await getDocs(productosCol);
+        const docs = snapshot.docs;
+        // 2) mezclamos aleatoriamente
+        const shuffled = docs
+          .map(doc => ({ id: doc.id, data: doc.data() }))
+          .sort(() => 0.5 - Math.random());
+        // 3) nos quedamos con los primeros 10
+        const selected = shuffled.slice(0, 10);
+
+        // 4) renderizamos cada card
+        selected.forEach(({ id, data }) => {
+          const card = crearCardProducto(data, id);
+          // opcional: forzar un ancho fijo para que quede uniforme
+          card.style.minWidth = "250px";
+          carousel.appendChild(card);
+        });
+
+        // 5) ocultar loader
+        loader.style.display = "none";
+        carousel.parentElement.style.opacity = 1;
+
+      } catch (error) {
+        console.error("Error cargando productos:", error);
+        loader.textContent = "Error al cargar productos.";
+        loader.style.color = "#c00";
+      }
+    }
+
+    // flechas para desplazar el carrusel
+    document.getElementById("all-left").addEventListener("click", () => {
+      const c = document.getElementById("products-carousel");
+      c.scrollBy({ left: -300, behavior: "smooth" });
+    });
+    document.getElementById("all-right").addEventListener("click", () => {
+      const c = document.getElementById("products-carousel");
+      c.scrollBy({ left: +300, behavior: "smooth" });
+    });
+
+    // Llamar a la función al cargar el DOM
+    document.addEventListener("DOMContentLoaded", () => {
+      cargarTodosProductos();
+    });
+
+
+    // ————————————————————————————————————————————————————————————
+    // 4) FUNCIÓN COMÚN PARA CREAR CARD DE PRODUCTO
+    // ————————————————————————————————————————————————————————————
+    function crearCardProducto(productoData, productoId) {
+      const { nombre, precio, urlImagen, tipo, categoria, descripcion } = productoData;
+
+      // 1) Contenedor principal
+      const card = document.createElement("div");
+      card.classList.add("product-card");
+
+      // 2) Imagen envuelta en <a>
+      const img = document.createElement("img");
+      img.src = urlImagen;
+      img.alt = nombre;
+      img.style.cursor = "pointer";
+
+      const linkImg = document.createElement("a");
+      linkImg.href = `/screens/detalle/detalleproducto.html`;
+      // 👉 Antes de navegar, guardo datos completos del producto
+      linkImg.addEventListener('click', () => {
+        localStorage.setItem(
+          'selectedProduct',
+          JSON.stringify({
+            id: productoId,
+            nombre,
+            precio,
+            urlImagen,
+            tipo,
+            categoria,
+            descripcion // ✅ ahora sí va a tener valor
+          })
+        );
+      });
+
+      linkImg.appendChild(img);
+      card.appendChild(linkImg);
+
+
+      // 3) Contenido textual
+      const contenido = document.createElement("div");
+      contenido.classList.add("card-content");
+
+      // Título
+      const titulo = document.createElement("h3");
+      titulo.textContent = nombre;
+      contenido.appendChild(titulo);
+
+      // Categoría
+      const infoCat = document.createElement("p");
+      infoCat.textContent = categoria ? categoria.toUpperCase() : "SIN CATEGORÍA";
+      infoCat.style.fontStyle = "italic";
+      infoCat.style.color = "#555";
+      contenido.appendChild(infoCat);
+
+      // Tipo
+      const infoTipo = document.createElement("p");
+      infoTipo.textContent = tipo ? tipo.toUpperCase() : "";
+      infoTipo.style.fontSize = "0.85rem";
+      infoTipo.style.color = "#777";
+      contenido.appendChild(infoTipo);
+
+      // Precio
+      const precioEl = document.createElement("div");
+      precioEl.classList.add("price");
+      precioEl.textContent = `$ ${Number(precio).toLocaleString('es-AR')}`;
+      contenido.appendChild(precioEl);
+
+      // 4) Botones de acción
+      const btnContainer = document.createElement("div");
+      btnContainer.classList.add("card-buttons");
+
+      // Agregar al carrito
+      const btnCart = document.createElement("button");
+      btnCart.classList.add("btn-cart");
+      btnCart.textContent = "Agregar al carrito";
+      // aquí podrías asignar btnCart.dataset.id = productoId;
+      btnContainer.appendChild(btnCart);
+      btnCart.addEventListener('click', () => {
+        addToCart(productoId, { nombre, precio, urlImagen });
+      });
+
+      // Comprar ahora
+      const btnBuy = document.createElement("button");
+      btnBuy.classList.add("btn-buy");
+      btnBuy.textContent = "Comprar ahora";
+      btnContainer.appendChild(btnBuy);
+
+      // Le atamos el listener:
+      btnBuy.addEventListener("click", () => {
+        // 1) Agrego al carrito exactamente igual que 'Agregar al carrito'
+        addToCart(productoId, {
+          nombre: productoData.nombre,
+          precio: productoData.precio,
+          urlImagen: productoData.urlImagen
+        });
+        // 2) Redirijo al paso de finalizar compra
+        window.location.href = "/screens/proceso/finalizar.html";
+      });
+
+      contenido.appendChild(btnContainer);
+
+      card.appendChild(contenido);
+      return card;
+    }
+
+    // ————————————————————————————————————————————————————————————
+    // CARRITO (unificado para inyectar en #cart-items)
+    // ————————————————————————————————————————————————————————————
+
+    function getCart() {
+      const cart = localStorage.getItem('cart');
+      return cart ? JSON.parse(cart) : {};
+    }
+    function saveCart(cart) {
+      localStorage.setItem('cart', JSON.stringify(cart));
+    }
+    function updateCartBadge() {
+      const totalQty = Object.values(getCart()).reduce((sum, i) => sum + i.qty, 0);
+      document.getElementById('cart-badge').textContent = totalQty;
+    }
+    function renderCartOverlay() {
+      const cart = getCart();
+      const container = document.getElementById('cart-items');
+      if (!container) return;
+      if (Object.keys(cart).length === 0) {
+        container.innerHTML = '<p style="text-align:center; padding:1rem">Tu carrito está vacío</p>';
+        return;
+      }
+      container.innerHTML = Object.entries(cart).map(([id, item]) => `
+        <div class="cart-item">
+          <img src="${item.urlImagen}" alt="${item.nombre}">
+          <div class="details">
+            <p class="name">${item.nombre}</p>
+            <p class="qty-price">${item.qty} x $${Number(item.precio).toLocaleString('es-AR')}</p>
+          </div>
+        </div>
+      `).join('');
+    }
+    function addToCart(id, data) {
+      const cart = getCart();
+      cart[id] = cart[id]
+        ? { ...cart[id], qty: cart[id].qty + 1 }
+        : { ...data, qty: 1 };
+      saveCart(cart);
+      updateCartBadge();
+      renderCartOverlay();
+    }
+
+    // Listeners para abrir / cerrar el drawer
+    document.getElementById('cart-toggle')
+      .addEventListener('click', () => {
+        document.getElementById('cart-drawer').classList.add('open');
+        updateCartBadge();
+        renderCartOverlay();
+      });
+    document.getElementById('cart-close')
+      .addEventListener('click', () => {
+        document.getElementById('cart-drawer').classList.remove('open');
+      });
+    // ————————————————————————————————————————————————————————————
+    // 5) AL CARGAR EL DOM, EJECUTAMOS LAS FUNCIONES
+    // ————————————————————————————————————————————————————————————
+    document.addEventListener("DOMContentLoaded", () => {
+      
+      // Inicializar contador y overlay
+      updateCartBadge();
+      renderCartOverlay();
+      cargarCategorias();
+      cargarBestSellers();
+      cargarTodosProductos();
+    });
+  </script>
+</body>
+</html>

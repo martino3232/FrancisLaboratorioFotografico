@@ -1,0 +1,458 @@
+<!-- finalizar.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Finalizar Compra | Laboratorio Fotografico | Francis Color </title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Font Awesome -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    integrity="sha512-pzo9U8ixRRTl+lyx8kkz+YMDpao+fKlW+OxyVd09O8Qzs165b7eOMPIHz4Lm/KmPdvfI9e5YXA+ybxILgY7kqw=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+
+  <style>
+    :root {
+      --font-base: 'Roboto', sans-serif;
+      --color-primario: #ddb732;
+      --color-secundario: #111;
+      --color-fondo: #f5f5f5;
+      --color-texto: #333;
+      --color-borde: #e0e0e0;
+      --border-radius: 6px;
+      --transition-fast: 0.2s ease;
+      --max-width: 1100px;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: var(--font-base);
+      background-color: var(--color-fondo);
+      color: var(--color-texto);
+      line-height: 1.5;
+    }
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+    img {
+      max-width: 100%;
+      display: block;
+    }
+    button {
+      cursor: pointer;
+      font-family: var(--font-base);
+      border: none;
+      background: none;
+    }
+
+    /* NAVBAR */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: var(--color-primario);
+      padding: 1rem 2rem;
+      z-index: 1000;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .navbar {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .navbar .logo a {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .navbar nav ul {
+      display: flex;
+      gap: 1rem;
+      list-style: none;
+    }
+    .navbar nav ul li a {
+      color: #fff;
+      font-weight: 500;
+      transition: color var(--transition-fast);
+    }
+    .navbar nav ul li a:hover {
+      color: #ddd;
+    }
+    .navbar .btn-cart {
+      background-color: #fff;
+      color: var(--color-primario);
+      padding: 0.4rem 0.8rem;
+      border-radius: var(--border-radius);
+      font-weight: 500;
+      transition: background-color var(--transition-fast);
+    }
+    .navbar .btn-cart:hover {
+      background-color: #f0f0f0;
+    }
+
+    /* BREADCRUMBS */
+    .breadcrumbs {
+      margin-top: 80px;
+      background: #fff;
+      border-bottom: 1px solid var(--color-borde);
+      padding: 1rem 2rem;
+    }
+    .breadcrumbs a {
+      color: var(--color-texto);
+      font-weight: 500;
+    }
+    .breadcrumbs span {
+      margin: 0 0.5rem;
+      color: #888;
+    }
+
+    /* CONTENEDOR PRINCIPAL */
+    .checkout-container {
+      max-width: var(--max-width);
+      margin: 2rem auto 4rem;
+      background: #fff;
+      border-radius: var(--border-radius);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      overflow: hidden;
+    }
+    .checkout-header {
+      background-color: var(--color-primario);
+      color: #fff;
+      padding: 1rem 2rem;
+      font-size: 1.25rem;
+      font-weight: 500;
+    }
+
+    /* LISTA DE PRODUCTOS */
+    .items-list {
+      padding: 2rem;
+    }
+    .item {
+      display: flex;
+      gap: 1rem;
+      border-bottom: 1px solid var(--color-borde);
+      padding-bottom: 1rem;
+      margin-bottom: 1rem;
+    }
+    .item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+    .item-image {
+      flex: 0 0 100px;
+      border: 1px solid var(--color-borde);
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      background: #fafafa;
+    }
+    .item-image img {
+      width: 100%;
+      height: auto;
+    }
+    .item-details {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .item-details h4 {
+      font-size: 1rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+    .item-details .price {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--color-primario);
+    }
+    .item-details .quantity {
+      font-size: 0.9rem;
+      color: var(--color-texto);
+    }
+    .item-subtotal {
+      flex: 0 0 100px;
+      text-align: right;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--color-texto);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    /* RESUMEN DE COMPRA */
+    .order-summary {
+      padding: 1.5rem 2rem;
+      border-top: 1px solid var(--color-borde);
+      background: #fafafa;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .summary-line {
+      display: flex;
+      justify-content: space-between;
+      font-size: 1rem;
+    }
+    .summary-line.total {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+    .btn-next {
+      margin: 1.5rem 2rem;
+      padding: 0.8rem;
+      background-color: var(--color-primario);
+      color: #fff;
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      font-weight: 600;
+      text-align: center;
+      transition: background-color var(--transition-fast);
+    }
+    .btn-next:hover {
+      background-color: #ddb732;
+    }
+
+    /* FOOTER */
+    footer {
+      background-color: #222;
+      color: #ccc;
+      padding: 2rem;
+    }
+    .footer-container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+    .footer-col {
+      flex: 1 1 200px;
+      margin-bottom: 1.5rem;
+    }
+    .footer-col h4 {
+      color: #fff;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+    .footer-col ul {
+      list-style: none;
+    }
+    .footer-col ul li {
+      margin-bottom: 0.5rem;
+    }
+    .footer-col ul li a {
+      color: #ccc;
+      font-size: 0.9rem;
+      transition: color var(--transition-fast);
+    }
+    .footer-col ul li a:hover {
+      color: var(--color-primario);
+    }
+    .social-icons {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+    }
+    .social-icons a {
+      color: #ccc;
+      font-size: 1.2rem;
+      transition: color var(--transition-fast);
+    }
+    .social-icons a:hover {
+      color: var(--color-primario);
+    }
+    .footer-bottom {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 0.85rem;
+      color: #777;
+    }
+
+    /* RESPONSIVO */
+    @media (max-width: 768px) {
+      .item {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      .item-subtotal {
+        text-align: left;
+      }
+      .order-summary {
+        padding: 1rem;
+      }
+      .btn-next {
+        margin: 1rem;
+      }
+      header {
+        padding: 0.75rem 1rem;
+      }
+      .breadcrumbs {
+        padding: 0.8rem 1rem;
+      }
+      .checkout-container {
+        margin: 1rem auto 3rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- NAVBAR -->
+  <header>
+    <div class="navbar">
+      <div class="logo">
+        <a href="index.html">Laboratorio Fotografico | Francis Color</a>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="index.html">Inicio</a></li>
+          <li><a href="categories.html">Categorías</a></li>
+          <li><a href="cart.html">Carrito</a></li>
+        </ul>
+      </nav>
+      <a href="cart.html" class="btn-cart"><i class="fas fa-shopping-cart"></i>&nbsp;Ver Carrito</a>
+    </div>
+  </header>
+
+  <!-- BREADCRUMBS -->
+  <div class="breadcrumbs">
+    <a href="index.html">Inicio</a><span>/</span>
+    <a href="cart.html">Carrito</a><span>/</span>
+    <span>Finalizar Compra</span>
+  </div>
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <div class="checkout-container">
+    <div class="checkout-header">Detalles de tu compra</div>
+
+    <!-- LISTA DE PRODUCTOS (ahora vacía, se llenará con JS) -->
+    <div class="items-list" id="items-list"></div>
+
+    <!-- RESUMEN DE COMPRA (valores dinámicos) -->
+    <div class="order-summary">
+      <div class="summary-line">
+        <span>Subtotal de productos</span>
+        <span id="sum-subtotal"></span>
+      </div>
+      <div class="summary-line">
+        <span>Envío</span>
+        <span>Gratis</span>
+      </div>
+      <div class="summary-line total">
+        <span>Total</span>
+        <span id="sum-total"></span>
+      </div>
+    </div>
+
+    <!-- BOTÓN SIGUIENTE -->
+    <a href="completarcompra.html" class="btn-next">Siguiente</a>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-container">
+      <div class="footer-col">
+        <h4>Sobre Nosotros</h4>
+        <ul>
+          <li><a href="about.html">Nuestra Historia</a></li>
+          <li><a href="blog.html">Blog / Noticias</a></li>
+          <li><a href="faq.html">Preguntas Frecuentes</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Categorías</h4>
+        <ul>
+          <li><a href="categories.html?cat=foto">Foto</a></li>
+          <li><a href="categories.html?cat=banner">Banner</a></li>
+          <li><a href="categories.html?cat=accesorios">Accesorios</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Atención al Cliente</h4>
+        <ul>
+          <li><a href="contact.html">Contáctanos</a></li>
+          <li><a href="policies.html">Políticas de Privacidad</a></li>
+          <li><a href="returns.html">Devoluciones</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Síguenos</h4>
+        <div class="social-icons">
+          <a href="#" target="_blank"><i class="fab fa-facebook-square"></i></a>
+          <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+          <a href="#" target="_blank"><i class="fab fa-whatsapp-square"></i></a>
+          <a href="#" target="_blank"><i class="fab fa-youtube-square"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; 2025 Laboratorio Fotografico | Francis Color. Todos los derechos reservados.
+    </div>
+  </footer>
+  <script>
+  // 1) Función para leer el carrito
+  function getCart() {
+    const c = localStorage.getItem('cart');
+    return c ? JSON.parse(c) : {};
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const cart = getCart();
+    const itemsList = document.getElementById('items-list');
+    let subtotal = 0;
+
+    // 2) Renderizamos cada producto
+    Object.values(cart).forEach(item => {
+    const price     = Number(item.precio);
+    const lineTotal = price * item.qty;
+    subtotal += lineTotal;
+
+    const div = document.createElement('div');
+    div.className = 'item';
+    div.innerHTML = `
+      <div class="item-image">
+        <img src="${item.urlImagen}" alt="${item.nombre}">
+      </div>
+      <div class="item-details">
+        <h4>${item.nombre}</h4>
+        <p class="quantity">Cantidad: ${item.qty}</p>
+        <p>Tipo de papel: ${item.tipoPapel || '—'}</p>
+        <p>Tipo de borde: ${item.tipoBorde || '—'}</p>
+        <p class="price">$${lineTotal.toLocaleString('es-AR')}</p>
+      </div>
+      <div class="item-subtotal">
+        $${lineTotal.toLocaleString('es-AR')}
+      </div>
+    `;
+    itemsList.appendChild(div);
+  });
+
+    // 3) Actualizamos subtotal y total
+    document.getElementById('sum-subtotal').textContent = `$${subtotal.toLocaleString('es-AR')}`;
+    document.getElementById('sum-total').textContent    = `$${subtotal.toLocaleString('es-AR')}`;
+  });
+</script>
+
+</body>
+</html>

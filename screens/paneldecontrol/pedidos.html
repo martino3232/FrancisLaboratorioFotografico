@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin • Pedidos Ultra Pro</title>
+
+  <!-- Google Fonts & FontAwesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+    rel="stylesheet"/>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    crossorigin="anonymous"/>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Firebase SDK -->
+  <script type="module" src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"></script>
+
+  <!-- Global CSS -->
+  <link rel="stylesheet" href="global.css"/>
+
+  <!-- Page-specific Styles -->
+  <style>
+    /* Container */
+    .app { display: flex; min-height:100vh; font-family: 'Roboto', sans-serif; }
+
+    /* Sidebar */
+    .sidebar {
+      background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+      color: #cbd5e1; width: 250px; transition: width 0.3s; overflow:hidden;
+    }
+    .sidebar.open { width: 60px; }
+    .sidebar h2 { padding:1.5rem 1rem; font-size:1.25rem; color:#f59e0b; }
+    .sidebar nav a {
+      display:flex; align-items:center; gap:0.75rem;
+      padding:0.75rem 1rem; color:inherit; transition: background 0.2s;
+    }
+    .sidebar nav a.active, .sidebar nav a:hover {
+      background: #0f172a; color:#f59e0b;
+    }
+    .sidebar nav a i { width:20px; text-align:center; }
+
+    /* Main area */
+    .main { flex:1; display:flex; flex-direction:column; background:#f9fafb; }
+
+    /* Topbar */
+    .topbar {
+      display:flex; justify-content:space-between; align-items:center;
+      background:#fff; padding:0.75rem 1.5rem; box-shadow:0 2px 6px rgba(0,0,0,0.05);
+    }
+    .topbar h1 { font-size:1.5rem; font-weight:500; }
+    .topbar .actions { display:flex; gap:1rem; }
+    .topbar .icon-btn {
+      position:relative; font-size:1.25rem; color:var(--text); cursor:pointer;
+      transition: color 0.2s;
+    }
+    .topbar .icon-btn:hover { color:var(--accent); }
+    .topbar .badge {
+      position:absolute; top:-5px; right:-10px;
+      background:#ef4444; color:#fff; font-size:0.6rem;
+      padding:2px 5px; border-radius:50%;
+    }
+
+    /* Stats cards */
+    .stats {
+      display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+      gap:1.5rem; padding:1.5rem;
+    }
+    .stat-card {
+      background:#fff; border-radius:var(--radius); padding:1.25rem;
+      display:flex; align-items:center; gap:1rem;
+      box-shadow:0 4px 12px rgba(0,0,0,0.05);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow:0 8px 20px rgba(0,0,0,0.08);
+    }
+    .stat-card i {
+      font-size:2rem; color:var(--accent); width:30px; text-align:center;
+    }
+    .stat-details h4 { margin:0 0 0.25rem; font-size:1rem; color:var(--primary); }
+    .stat-details p { margin:0; font-size:1.5rem; font-weight:600; color:var(--text); }
+
+    /* Charts */
+    .charts {
+      display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; padding:0 1.5rem 1.5rem;
+    }
+    @media(max-width:900px) { .charts { grid-template-columns:1fr; } }
+    .chart-card {
+      background:#fff; border-radius:var(--radius); padding:1rem;
+      box-shadow:0 4px 12px rgba(0,0,0,0.05);
+    }
+    .chart-card h4 { margin-bottom:1rem; font-size:1.1rem; }
+
+    /* Filter bar */
+    .filter-bar {
+      display:flex; flex-wrap:wrap; gap:1rem; align-items:center;
+      padding:0 1.5rem 1rem;
+    }
+    .filter-bar input, .filter-bar select {
+      padding:0.5rem 1rem; border:1px solid #d1d5db; border-radius:var(--radius);
+      transition:border 0.2s;
+    }
+    .filter-bar input:focus, .filter-bar select:focus { border-color:var(--accent); outline:none; }
+    .filter-bar button {
+      padding:0.5rem 1rem; background:var(--accent); color:#fff; border:none;
+      border-radius:var(--radius); cursor:pointer; transition:background 0.2s;
+    }
+    .filter-bar button:hover { background:#d97706; }
+
+    /* Table */
+    .table-container {
+      padding:0 1.5rem 1.5rem;
+    }
+    table {
+      width:100%; border-collapse:collapse; background:#fff; border-radius:var(--radius);
+      overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.05);
+      min-width:800px;
+    }
+    th, td {
+      padding:0.75rem 1rem; border-bottom:1px solid #e5e7eb; text-align:left;
+    }
+    th {
+      background:var(--primary); color:#fff; position:sticky; top:0; z-index:1;
+    }
+    tbody tr:hover { background:#f9fafb; }
+    .actions-cell button {
+      background:none; border:none; cursor:pointer; margin-right:0.5rem;
+      font-size:1rem; color:var(--text);
+    }
+    .actions-cell button:hover { color:var(--accent); }
+
+    /* Pagination */
+    .pagination {
+      display:flex; justify-content:flex-end; gap:0.5rem;
+      padding:0 1.5rem 1.5rem;
+    }
+    .pagination button {
+      padding:0.4rem 0.75rem; border:1px solid #d1d5db; background:#fff;
+      border-radius:var(--radius); cursor:pointer; transition:background 0.2s;
+    }
+    .pagination button:hover, .pagination button.active {
+      background:var(--accent); color:#fff; border-color:var(--accent);
+    }
+
+    /* Modal */
+    #order-modal {
+      display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6);
+      justify-content:center; align-items:center; z-index:1000;
+    }
+    .modal-content {
+      background:#fff; border-radius:var(--radius); padding:2rem;
+      width:100%; max-width:400px; position:relative;
+      box-shadow:0 8px 24px rgba(0,0,0,0.1);
+    }
+    .modal-content h3 { margin-top:0; font-size:1.25rem; }
+    .modal-content .close {
+      position:absolute; top:1rem; right:1rem; background:none;
+      border:none; font-size:1.25rem; cursor:pointer;
+    }
+    .modal-content .form-control {
+      margin-bottom:1rem;
+    }
+    .modal-content .form-control label {
+      display:block; margin-bottom:0.25rem; font-size:0.9rem; color:#555;
+    }
+    .modal-content .form-control select {
+      width:100%; padding:0.5rem; border:1px solid #d1d5db;
+      border-radius:var(--radius);
+    }
+    .modal-content button.save-btn {
+      padding:0.5rem 1rem; background:var(--accent); color:#fff; border:none;
+      border-radius:var(--radius); cursor:pointer; transition:background 0.2s;
+    }
+    .modal-content button.save-btn:hover { background:#d97706; }
+  </style>
+</head>
+<body>
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <h2>Admin Ultra</h2>
+    <nav>
+      <a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+      <a href="clientes.html"><i class="fas fa-users"></i> Clientes</a>
+      <a href="productos.html"><i class="fas fa-box-open"></i> Productos</a>
+      <a href="pedidos.html" class="active"><i class="fas fa-shopping-cart"></i> Pedidos</a>
+      <a href="configuracion.html"><i class="fas fa-cog"></i> Configuración</a>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <button class="btn-menu" onclick="toggleSidebar()">☰</button>
+      <h1>Pedidos</h1>
+      <div class="actions">
+        <div class="icon-btn"><i class="fas fa-filter"></i></div>
+        <div class="icon-btn"><i class="fas fa-bell"></i><span class="badge" id="notif-count">4</span></div>
+        <div class="icon-btn"><i class="fas fa-user-circle"></i></div>
+      </div>
+    </header>
+
+    <!-- STATS -->
+    <div class="stats">
+      <div class="stat-card">
+        <i class="fas fa-shopping-bag"></i>
+        <div class="stat-details">
+          <h4>Total Pedidos</h4><p id="stat-total-pedidos">Cargando...</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <i class="fas fa-clock"></i>
+        <div class="stat-details">
+          <h4>Pedidos Hoy</h4><p id="stat-today-pedidos">Cargando...</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <i class="fas fa-dollar-sign"></i>
+        <div class="stat-details">
+          <h4>Ingresos Hoy</h4><p id="stat-today-revenue">Cargando...</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <i class="fas fa-chart-line"></i>
+        <div class="stat-details">
+          <h4>Últimos 30d</h4><p id="stat-30d-pedidos">Cargando...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHARTS -->
+    <div class="charts">
+      <div class="chart-card">
+        <h4>Pedidos Últimos 7 Días</h4>
+        <canvas id="chart-week" height="80"></canvas>
+      </div>
+      <div class="chart-card">
+        <h4>Ingresos Últimos 7 Días</h4>
+        <canvas id="chart-week-revenue" height="80"></canvas>
+      </div>
+    </div>
+
+    <!-- FILTER BAR -->
+    <div class="filter-bar">
+      <input type="date" id="filter-from"/>
+      <input type="date" id="filter-to"/>
+      <select id="filter-status">
+        <option value="">Todos</option>
+        <option value="Pendiente">Pendiente</option>
+        <option value="Enviado">Enviado</option>
+        <option value="Entregado">Entregado</option>
+      </select>
+      <button onclick="applyFilters()"><i class="fas fa-search"></i> Aplicar</button>
+      <button onclick="resetFilters()"><i class="fas fa-times"></i> Limpiar</button>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-container">
+      <table>
+        <!-- Cambia tu <thead> por esto -->
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th>Dirección</th>
+            <th>Imágenes</th>
+            <th>Método Pago</th>
+            <th>Pedido</th>
+            <th>Total</th>
+            <th>Fecha</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody id="orders-body"></tbody>
+      </table>
+    </div>
+
+    <!-- PAGINATION -->
+    <div class="pagination" id="pagination"></div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="order-modal" class="flex-center">
+  <div class="modal-content">
+    <button class="close" onclick="closeModal()">×</button>
+    <h3>Actualizar Estado</h3>
+    <div class="form-control">
+      <label>Estado</label>
+      <select id="modal-status">
+        <option value="Pendiente">Pendiente</option>
+        <option value="Enviado">Enviado</option>
+        <option value="Entregado">Entregado</option>
+      </select>
+    </div>
+    <button class="save-btn" onclick="saveStatus()">Guardar</button>
+  </div>
+</div>
+
+<script>
+  function toggleSidebar(){
+    document.getElementById('sidebar').classList.toggle('open');
+  }
+  function closeModal(){
+    document.getElementById('order-modal').style.display='none';
+  }
+</script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+  import {
+    getFirestore, collection, getDocs, query, where,
+    orderBy, limit, startAfter, doc, updateDoc, deleteDoc
+  } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+
+  // Firebase init
+  const cfg = {
+    apiKey:    "AIzaSyBWrYvbvTEhX_ZGswZEtfOUBhCJ34wp92M",
+    authDomain:"francisfotografia-a8ec2.firebaseapp.com",
+    projectId: "francisfotografia-a8ec2",
+    storageBucket:"francisfotografia-a8ec2.firebasestorage.app",
+    messagingSenderId:"372558145730",
+    appId:      "1:372558145730:web:f2f33f67ab7175723c335b"
+  };
+  const app = initializeApp(cfg);
+  const db  = getFirestore(app);
+  const col = collection(db,"pedidos");
+  // Función para descargar imagen Base64 como JPG
+  window.downloadImage = (base64, filename) => {
+    const link = document.createElement('a');
+    link.href = `data:image/jpeg;base64,${base64}`;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Función para borrar un pedido
+  window.deleteOrder = async (id) => {
+    if (!confirm('¿Eliminar este pedido?')) return;
+    await deleteDoc(doc(db, 'pedidos', id));
+    loadOrders();
+  };
+  // Pagination state
+  let lastDoc = null, editOrderId = null;
+  const pageSize = 10;
+
+  // Utility to render spark/chart
+  function renderChart(canvasId,type,labels,data,color){
+    new Chart(document.getElementById(canvasId).getContext('2d'),{
+      type, data:{ labels, datasets:[{ data, backgroundColor:color||'#3b82f6', borderColor:color||'#3b82f6', fill:type==='bar'}] },
+      options:{ responsive:true, plugins:{legend:{display:false}} }
+    });
+  }
+
+  // Load dashboard stats & charts
+  async function loadDashboard(){
+    const allSnap = await getDocs(col);
+    const all = allSnap.docs.map(d=>d.data());
+    // Stats
+    document.getElementById('stat-total-pedidos').textContent = all.length;
+    const today = new Date(); today.setHours(0,0,0,0);
+    const todayOrders = all.filter(o => o.fecha?.toDate instanceof Function && o.fecha.toDate() >= today).length;
+    document.getElementById('stat-today-pedidos').textContent = todayOrders;
+    const revToday = all
+  .filter(o => o.fecha?.toDate instanceof Function && o.fecha.toDate() >= today)
+  .reduce((s, o) => s + (o.total || 0), 0);
+    document.getElementById('stat-today-revenue').textContent = `$ ${revToday.toLocaleString()}`;
+    const last30 = all
+  .filter(o => o.fecha?.toDate instanceof Function && o.fecha.toDate() >= new Date(Date.now() - 30 * 24 * 3600 * 1000))
+  .length;
+    document.getElementById('stat-30d-pedidos').textContent = last30;
+
+    // Weekly orders & revenue
+    const labels=[], dataOrders=[], dataRev=[];
+    for(let i=6;i>=0;i--){
+      const d = new Date(); d.setDate(d.getDate()-i);
+      labels.push(d.toLocaleDateString('es-AR',{day:'numeric',month:'short'}));
+      const dayStart = new Date(d); dayStart.setHours(0,0,0,0);
+      const dayEnd   = new Date(d); dayEnd.setHours(23,59,59,999);
+      const orders = all.filter(o =>
+  o.fecha?.toDate instanceof Function &&
+  o.fecha.toDate() >= dayStart &&
+  o.fecha.toDate() <= dayEnd
+);
+
+      dataOrders.push(orders.length);
+      dataRev.push(orders.reduce((s,o)=>s+o.total,0));
+    }
+    renderChart('chart-week','bar',labels,dataOrders);
+    renderChart('chart-week-revenue','line',labels,dataRev,'#10b981');
+  }
+
+  async function loadOrders(direction='next') {
+  let q;
+  if (direction === 'next' && lastDoc) {
+    q = query(
+      col,
+      where('fecha', '!=', null),
+      orderBy('fecha', 'desc'),
+      startAfter(lastDoc),
+      limit(pageSize)
+    );
+  } else {
+    lastDoc = null;
+    q = query(
+      col,
+      where('fecha', '!=', null),
+      orderBy('fecha', 'desc'),
+      limit(pageSize)
+    );
+  }
+
+
+  const snap = await getDocs(q);
+  const tbody = document.getElementById('orders-body');
+  tbody.innerHTML = '';
+
+  snap.forEach(docSnap => {
+      lastDoc = docSnap;
+      const d = docSnap.data();
+
+      // Cliente / Dirección
+      const cliente   = d.cliente   || '—';
+      const direccion = d.direccion || '—';
+
+      // Imágenes
+      const imagenesObj = d.imagenes || {};
+      const imagesHTML = Object.entries(imagenesObj)
+        .map(([key, b64]) => `
+          <div style="display:inline-block; text-align:center; margin-right:8px;">
+            <img src="data:image/jpeg;base64,${b64}" width="50" style="display:block; margin-bottom:4px;"/>
+            <button onclick="downloadImage('${b64}','${key}.jpg')" style="font-size:.75rem;">Descargar</button>
+          </div>
+        `).join('');
+
+      // Método de pago
+      const metodo = d.metodoPago || '—';
+
+      // Pedido: detalle de items
+      const pedidoHTML = (Array.isArray(d.pedido) ? d.pedido : [])
+        .map(item => `
+          <div>
+            <strong>${item.producto}</strong><br/>
+            <small>Cant: ${item.cantidad}, Borde: ${item.tipoBorde}, Papel: ${item.tipoPapel}</small><br/>
+            <small>Valor: $${item.valortotal}</small>
+          </div>
+        `).join('<hr style="margin:4px 0;"/>');
+
+      // Total y fecha
+      const total = d.total?.toLocaleString() || '0';
+      let fecha = '—';
+      if (d.fecha?.toDate) fecha = d.fecha.toDate().toLocaleString('es-AR');
+      else if (typeof d.fecha === 'string') fecha = d.fecha;
+
+      // Construir fila
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${cliente}</td>
+        <td>${direccion}</td>
+        <td>${imagesHTML}</td>
+        <td>${metodo}</td>
+        <td>${pedidoHTML}</td>
+        <td>$${total}</td>
+        <td>${fecha}</td>
+        <td class="actions-cell">
+          <!-- Botón editar abre tu modal existente -->
+          <button onclick="openModal('${docSnap.id}','${d.estado||'Pendiente'}')">
+            <i class="fas fa-edit"></i>
+          </button>
+          <!-- Botón eliminar -->
+          <button onclick="deleteOrder('${docSnap.id}')">
+            <i class="fas fa-trash"></i>
+          </button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    renderPagination();
+  }
+
+
+  // Pagination buttons
+  function renderPagination(){
+    const pg = document.getElementById('pagination');
+    pg.innerHTML = '';
+    const prev = document.createElement('button'); prev.textContent='Anterior';
+    prev.onclick=()=>loadOrders('prev');
+    const next = document.createElement('button'); next.textContent='Siguiente';
+    next.onclick=()=>loadOrders('next');
+    pg.append(prev,next);
+  }
+
+  // Filters
+  function applyFilters(){
+    lastDoc = null;
+    // For brevity, just reload
+    loadOrders();
+  }
+  function resetFilters(){
+    document.getElementById('filter-from').value='';
+    document.getElementById('filter-to').value='';
+    document.getElementById('filter-status').value='';
+    applyFilters();
+  }
+
+  // Modal for status
+  function openModal(id, estado){
+    editOrderId = id;
+    document.getElementById('modal-status').value = estado;
+    document.getElementById('order-modal').style.display='flex';
+  }
+  async function saveStatus(){
+    const newStatus = document.getElementById('modal-status').value;
+    const ref = doc(db,'pedidos',editOrderId);
+    await updateDoc(ref,{ estado:newStatus });
+    closeModal();
+    loadOrders();
+  }
+
+  // Initialize
+  document.addEventListener('DOMContentLoaded',()=>{
+    loadDashboard();
+    loadOrders();
+  });
+</script>
+</body>
+</html>

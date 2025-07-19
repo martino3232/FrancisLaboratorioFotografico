@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin • Productos Ultra Pro</title>
+
+  <!-- Google Fonts & FontAwesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    crossorigin="anonymous"/>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Firebase SDK -->
+  <script type="module" src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"></script>
+
+  <!-- Global Styles -->
+  <style>
+    :root {
+      --primary: #374151;    /* gris oscuro */
+      --accent:  #f59e0b;    /* ámbar */
+      --text:    #111;
+      --radius:  8px;
+      --transition: .2s;
+    }
+    body{ margin:0; font-family:'Roboto',sans-serif; background:#f3f4f6; color:var(--text) }
+    h1{ margin:0 }
+    .app { display:flex; min-height:100vh }
+    aside.sidebar {
+      width:240px; background:#1f2937; color:#fff; padding:1rem;
+      flex-shrink:0; display:flex; flex-direction:column;
+    }
+    aside.sidebar h2{ margin-bottom:1rem }
+    aside.sidebar nav a {
+      color:#d1d5db; display:block; padding:.5rem 0; text-decoration:none;
+      transition:color var(--transition);
+    }
+    aside.sidebar nav a.active,
+    aside.sidebar nav a:hover{ color:#fff }
+    .main{ flex:1; display:flex; flex-direction:column }
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      background:#fff; padding:1rem; box-shadow:0 1px 4px rgba(0,0,0,0.1);
+    }
+    .topbar .btn-menu{ font-size:1.25rem; background:none; border:none; cursor:pointer }
+    .actions .icon-btn{
+      position:relative; margin-left:1rem; cursor:pointer;
+    }
+    .actions .badge{
+      position:absolute; top:-6px; right:-6px;
+      background:#ef4444; color:#fff; font-size:.65rem;
+      width:16px; height:16px; border-radius:50%; display:flex;
+      align-items:center; justify-content:center;
+    }
+    .content{ padding:1.5rem; overflow-y:auto; }
+    .quick-actions{ display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:2rem }
+    .action-btn{
+      flex:1 1 200px; background:var(--accent); color:#fff;
+      padding:1rem; border-radius:var(--radius);
+      display:flex; align-items:center; gap:.75rem;
+      cursor:pointer; transition:background var(--transition)
+    }
+    .action-btn:hover{ background:#d97706 }
+    .stats{
+      display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+      gap:1.5rem; margin-bottom:2rem;
+    }
+    .stat-card{
+      background:#fff; border-radius:var(--radius);
+      padding:1.25rem; display:flex; align-items:center;
+      gap:1rem; box-shadow:0 4px 12px rgba(0,0,0,0.05);
+      transition:transform var(--transition), box-shadow var(--transition)
+    }
+    .stat-card:hover{ transform:translateY(-4px); box-shadow:0 8px 20px rgba(0,0,0,0.08) }
+    .stat-card i{ font-size:2rem; color:var(--accent); width:30px; text-align:center }
+    .stat-details h4{ margin:0 0 .25rem; font-size:1rem; color:var(--primary) }
+    .stat-details p{ margin:0; font-size:1.5rem; font-weight:600; color:var(--text) }
+    .charts-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+    }
+
+    /* cada tarjeta: cuadrada gracias a aspect-ratio */
+    .chart-wrapper {
+    background: #fff;
+    border-radius: var(--radius);
+    padding: 1rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    aspect-ratio: 1;            /* fuerza un ancho = alto */
+    }
+    .chart-wrapper canvas {
+      flex: 1;
+      width: 100%;
+    }
+    .chart-wrapper h4{ margin:0 0 1rem }
+
+    .filter-bar{ display:flex; flex-wrap:wrap; gap:1rem; align-items:center; margin:1.5rem 0 }
+    .filter-bar input, .filter-bar select { padding:.5rem 1rem; border:1px solid #d1d5db; border-radius:var(--radius); transition:border-color var(--transition) }
+    .filter-bar input:focus, .filter-bar select:focus{ outline:none; border-color:var(--accent) }
+    .filter-bar button{ padding:.5rem 1rem; background:var(--accent); color:#fff; border:none; border-radius:var(--radius); cursor:pointer }
+    .filter-bar button:hover{ background:#d97706 }
+
+    .table-container{ background:#fff; border-radius:var(--radius); box-shadow:0 4px 12px rgba(0,0,0,0.05); overflow:auto; margin-bottom:1rem }
+    table{ width:100%; border-collapse:collapse; min-width:900px }
+    th, td{ padding:.75rem 1rem; border-bottom:1px solid #e5e7eb; text-align:left }
+    th{ background:var(--primary); color:#fff; position:sticky; top:0 }
+    tbody tr:hover{ background:#f9fafb }
+
+    .pagination{ display:flex; justify-content:flex-end; gap:.5rem; margin-bottom:2rem }
+    .pagination button{ padding:.4rem .75rem; border:1px solid #d1d5db; background:#fff; border-radius:var(--radius); cursor:pointer }
+    .pagination button.active, .pagination button:hover{ background:var(--accent); color:#fff; border-color:var(--accent) }
+
+    /* Modal */
+    #product-modal{ display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:1000; align-items:center; justify-content:center }
+    #product-modal .modal-content{ background:#fff; border-radius:var(--radius); padding:2rem; width:100%; max-width:500px; position:relative }
+    #product-modal .modal-content .close{ position:absolute; top:1rem; right:1rem; background:none; border:none; font-size:1.25rem; cursor:pointer }
+
+    .form-control{ margin-bottom:1rem; display:flex; flex-direction:column }
+    .form-control label{ margin-bottom:.25rem; font-weight:500 }
+    .form-control input, .form-control select{ padding:.5rem; border:1px solid #d1d5db; border-radius:var(--radius); }
+  </style>
+</head>
+<body>
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <h2>Admin Ultra</h2>
+    <nav>
+      <a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+      <a href="clientes.html"><i class="fas fa-users"></i> Clientes</a>
+      <a href="productos.html" class="active"><i class="fas fa-box-open"></i> Productos</a>
+      <a href="pedidos.html"><i class="fas fa-shopping-cart"></i> Pedidos</a>
+      <a href="configuracion.html"><i class="fas fa-cog"></i> Configuración</a>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <button class="btn-menu" onclick="toggleSidebar()">☰</button>
+      <h1>Productos</h1>
+      <div class="actions">
+        <div class="icon-btn"><i class="fas fa-search"></i></div>
+        <div class="icon-btn"><i class="fas fa-bell"></i><span class="badge">2</span></div>
+        <div class="icon-btn"><i class="fas fa-user-circle"></i></div>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="content">
+      <!-- Quick Actions -->
+      <div class="quick-actions">
+        <div class="action-btn" onclick="openProductModal()">
+          <i class="fas fa-plus-circle"></i><span>Nuevo Producto</span>
+        </div>
+        <div class="action-btn" onclick="exportCSV()">
+          <i class="fas fa-file-csv"></i><span>Exportar CSV</span>
+        </div>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="stats">
+        <div class="stat-card">
+          <i class="fas fa-boxes"></i>
+          <div class="stat-details">
+            <h4>Total Productos</h4>
+            <p id="stat-total">Cargando...</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <i class="fas fa-exclamation-triangle"></i>
+          <div class="stat-details">
+            <h4>Bajo Stock (&lt;10)</h4>
+            <p id="stat-lowstock">Cargando...</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <i class="fas fa-chart-pie"></i>
+          <div class="stat-details">
+            <h4>Categorías</h4>
+            <p id="stat-cats">Cargando...</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <i class="fas fa-calendar-plus"></i>
+          <div class="stat-details">
+            <h4>Nuevos 30d</h4>
+            <p id="stat-new">Cargando...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="charts-row">
+      <div class="chart-wrapper">
+        <h4>Distribución por Categoría</h4>
+        <!-- quita el atributo height -->
+        <canvas id="chart-cats"></canvas>
+      </div>
+      <div class="chart-wrapper">
+        <h4>Productos Añadidos (últimos 30 días)</h4>
+        <canvas id="chart-trend"></canvas>
+      </div>
+    </div>
+
+      <!-- Filters -->
+      <div class="filter-bar">
+        <input type="search" id="search-name" placeholder="Buscar por nombre..."/>
+        <select id="filter-cat">
+          <option value="">Todas las categorías</option>
+        </select>
+        <button onclick="applyFilters()">Filtrar</button>
+        <button onclick="clearFilters()">Limpiar</button>
+      </div>
+
+      <!-- Table -->
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Imagen</th>
+              <th>Nombre</th>
+              <th>SKU</th>
+              <th>Precio</th>
+              <th>Stock</th>
+              <th>Categoría</th>
+              <th>Tipo</th>
+              <th>Estado</th>
+              <th>URL Imagen</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="products-body"></tbody>
+        </table>
+      </div>
+
+
+      <!-- Pagination -->
+      <div class="pagination" id="pagination"></div>
+    </main>
+  </div>
+</div>
+
+<!-- Product Modal -->
+<div id="product-modal" onclick="closeModal(event)">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <button class="close" onclick="closeModal(event)">×</button>
+    <h3 id="modal-title">Nuevo Producto</h3>
+    <div class="form-control"><label>Nombre</label><input id="prod-nombre"/></div>
+    <div class="form-control"><label>Precio</label><input id="prod-precio" type="number"/></div>
+    <div class="form-control"><label>Stock</label><input id="prod-stock" type="number"/></div>
+    <div class="form-control"><label>Categoría</label><select id="prod-categoria"></select></div>
+    <div class="form-control"><label>URL Imagen</label><input id="prod-url"/></div>
+    <button class="btn" onclick="saveProduct()">Guardar</button>
+  </div>
+</div>
+
+<script>
+  function toggleSidebar(){
+    document.getElementById('sidebar').classList.toggle('open');
+  }
+  function openProductModal(){
+    document.getElementById('product-modal').style.display='flex';
+    document.getElementById('modal-title').textContent='Nuevo Producto';
+    editId = null;
+    // limpiar campos
+    ['prod-nombre','prod-precio','prod-stock','prod-url'].forEach(id=>document.getElementById(id).value='');
+  }
+  function closeModal(e){
+    if(e.target.id==='product-modal' || e.target.classList.contains('close')){
+      document.getElementById('product-modal').style.display='none';
+    }
+  }
+</script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+  import {
+    getFirestore, collection, getDocs, addDoc,
+    updateDoc, deleteDoc, doc, getDoc,
+    query, where, orderBy, limit, startAfter,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+  // 1) Inicializa Firebase
+  const config = {
+     apiKey: "AIzaSyBWrYvbvTEhX_ZGswZEtfOUBhCJ34wp92M",
+  authDomain: "francisfotografia-a8ec2.firebaseapp.com",
+  projectId: "francisfotografia-a8ec2",
+  storageBucket: "francisfotografia-a8ec2.firebasestorage.app",
+  messagingSenderId: "372558145730",
+  appId: "1:372558145730:web:f2f33f67ab7175723c335b"
+  };
+  const app = initializeApp(config);
+  const db = getFirestore(app);
+  const prodCol = collection(db, "productos");
+
+  // Estado
+  let editId = null;
+  let lastDoc = null;
+  const pageSize = 10;
+  let allCategories = [];
+
+  // Al inicio
+  document.addEventListener('DOMContentLoaded', async () => {
+    await loadStats();
+    await loadCategories();
+    await loadProductsPage();
+    renderCatsChart();
+    renderTrendChart();
+  });
+
+  // — Estadísticas
+  async function loadStats(){
+    // 1) Traer todos los productos
+    const snap = await getDocs(prodCol);
+
+    // 2) Total de productos
+    const total = snap.size;
+    document.getElementById('stat-total').textContent = total;
+
+    // 3) Bajo stock (<10)
+    const low = snap.docs.filter(d => {
+      const data = d.data();
+      return typeof data.stock === 'number' && data.stock < 10;
+    }).length;
+    document.getElementById('stat-lowstock').textContent = low;
+
+    // 4) Cantidad de categorías únicas
+    const catsSet = new Set(snap.docs.map(d => d.data().categoria));
+    document.getElementById('stat-cats').textContent = catsSet.size;
+
+    // 5) Nuevos en últimos 30 días
+    const nowMs = Date.now();
+    const new30 = snap.docs.filter(docSnap => {
+      const data = docSnap.data();
+      // Si no existe registro, lo ignoramos
+      if (!data.registro) return false;
+      // Convertimos el Timestamp de Firestore a milisegundos
+      const registroMs = data.registro.toDate().getTime();
+      return (nowMs - registroMs) < 30 * 24 * 60 * 60 * 1000;
+    }).length;
+    document.getElementById('stat-new').textContent = new30;
+  }
+
+  // — Carga categorías en filtros y modal
+  async function loadCategories(){
+    const snap = await getDocs(prodCol);
+    allCategories = [...new Set(snap.docs.map(d=>d.data().categoria))];
+    const selF = document.getElementById('filter-cat'),
+          selM = document.getElementById('prod-categoria');
+    allCategories.forEach(c=>{
+      selF.innerHTML += `<option value="${c}">${c}</option>`;
+      selM.innerHTML += `<option value="${c}">${c}</option>`;
+    });
+  }
+
+  // — Gráfico de categorías
+  async function renderCatsChart(){
+    const snap = await getDocs(prodCol);
+    const counts = {};
+    snap.forEach(d=> {
+      const c=d.data().categoria;
+      counts[c]=(counts[c]||0)+1;
+    });
+    new Chart(
+      document.getElementById('chart-cats').getContext('2d'),{
+      type:'doughnut',
+      data:{
+        labels:Object.keys(counts),
+        datasets:[{ data:Object.values(counts),
+          backgroundColor:['#f59e0b','#10b981','#3b82f6','#6366f1','#ef4444']
+        }]
+      },
+      options:{responsive:true}
+    });
+  }
+
+  // — Gráfico tendencia (aleatorio)
+  function renderTrendChart(){
+    const labels=[], data=[];
+    for(let i=29;i>=0;i--){
+      const d=new Date; d.setDate(d.getDate()-i);
+      labels.push(d.toLocaleDateString('es-AR',{day:'numeric',month:'short'}));
+      data.push(Math.floor(Math.random()*5)+1);
+    }
+    new Chart(
+      document.getElementById('chart-trend').getContext('2d'),{
+      type:'line',
+      data:{
+        labels, datasets:[{ data, borderColor:'#3b82f6', fill:false }]
+      },
+      options:{
+        plugins:{legend:{display:false}},
+        scales:{x:{display:false},y:{display:false}}
+      }
+    });
+  }
+
+  async function loadProductsPage(direction = 'next') {
+      let q;
+      if (direction === 'next' && lastDoc) {
+        q = query(prodCol,
+                  orderBy('nombre','asc'),
+                  startAfter(lastDoc),
+                  limit(pageSize));
+      } else {
+        lastDoc = null;
+        q = query(prodCol,
+                  orderBy('nombre','asc'),
+                  limit(pageSize));
+      }
+      const snap = await getDocs(q);
+      const tbody = document.getElementById('products-body');
+      tbody.innerHTML = '';
+
+      snap.forEach(d => {
+        lastDoc = d;
+        const p = d.data();
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>
+            <img src="${p.urlImagen}" 
+                alt="${p.nombre}" 
+                style="width:50px; height:50px; object-fit:cover; border-radius:4px;" />
+          </td>
+          <td>${p.nombre}</td>
+          <td>${p.sku || ''}</td>
+          <td>$${Number(p.precio).toLocaleString()}</td>
+          <td>${p.stock}</td>
+          <td>${p.categoria}</td>
+          <td>${p.tipo}</td>
+          <td>${p.estado}</td>
+          <td>
+            <a href="${p.urlImagen}" target="_blank" 
+              style="font-size:0.85rem; color:var(--accent);">
+              Ver imagen
+            </a>
+          </td>
+          <td>
+            <button onclick="startEdit('${d.id}')" 
+                    title="Editar">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button onclick="deleteProduct('${d.id}')" 
+                    title="Eliminar">
+              <i class="fas fa-trash-alt" style="color:#ef4444;"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      renderPagination();
+    }
+
+  // — Paginación
+  function renderPagination(){
+    const pg = document.getElementById('pagination');
+    pg.innerHTML = '';
+    const btnPrev = document.createElement('button');
+    btnPrev.textContent = 'Anterior';
+    btnPrev.disabled = !lastDoc;
+    btnPrev.onclick = ()=>loadProductsPage('prev');
+    const btnNext = document.createElement('button');
+    btnNext.textContent = 'Siguiente';
+    btnNext.onclick = ()=>loadProductsPage('next');
+    pg.append(btnPrev, btnNext);
+  }
+
+  // — Filtros
+  function applyFilters(){
+    lastDoc=null;
+    loadProductsPage();
+  }
+  function clearFilters(){
+    document.getElementById('search-name').value='';
+    document.getElementById('filter-cat').value='';
+    applyFilters();
+  }
+
+  // — CRUD: Editar
+  window.startEdit = async function(id){
+    editId = id;
+    document.getElementById('modal-title').textContent='Editar Producto';
+    const ref = doc(db,'productos',id);
+    const snap = await getDoc(ref);
+    const p = snap.data();
+    document.getElementById('prod-nombre').value   = p.nombre;
+    document.getElementById('prod-precio').value   = p.precio;
+    document.getElementById('prod-stock').value    = p.stock;
+    document.getElementById('prod-categoria').value= p.categoria;
+    document.getElementById('prod-url').value      = p.urlImagen;
+    openProductModal();
+  };
+
+  // — CRUD: Guardar (nuevo / editar)
+  window.saveProduct = async function(){
+    const payload = {
+      nombre:    document.getElementById('prod-nombre').value.trim(),
+      precio:    Number(document.getElementById('prod-precio').value),
+      stock:     Number(document.getElementById('prod-stock').value),
+      categoria: document.getElementById('prod-categoria').value,
+      urlImagen: document.getElementById('prod-url').value.trim(),
+      registro:  serverTimestamp()
+    };
+    if(editId){
+      await updateDoc(doc(db,'productos',editId), payload);
+    } else {
+      await addDoc(prodCol, payload);
+    }
+    closeModal({target:{id:'product-modal'}});
+    await loadProductsPage();
+    await loadStats();
+  };
+
+  // — CRUD: Eliminar
+  window.deleteProduct = async function(id){
+    if(confirm('¿Eliminar este producto?')){
+      await deleteDoc(doc(db,'productos',id));
+      await loadProductsPage();
+      await loadStats();
+    }
+  };
+
+  // — Exportar CSV
+  window.exportCSV = async function(){
+    const snap = await getDocs(prodCol);
+    let csv = 'Nombre,Precio,Stock,Categoría,URL\n';
+    snap.forEach(d=>{
+      const p=d.data();
+      csv += `"${p.nombre}",${p.precio},${p.stock},"${p.categoria}","${p.urlImagen}"\n`;
+    });
+    const blob = new Blob([csv],{type:'text/csv'});
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url; a.download = 'productos.csv';
+    document.body.append(a); a.click(); a.remove();
+  };
+</script>
+</body>
+</html>
