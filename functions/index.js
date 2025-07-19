@@ -3,11 +3,14 @@
 const express = require('express');
 const cors = require('cors');
 const mercadopago = require('mercadopago');
+const path = require('path');
+
 require('dotenv').config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(express.static(path.join(__dirname, '../public')));
 
 // Configura MercadoPago con el token del .env
 const mp = new mercadopago.MercadoPagoConfig({
