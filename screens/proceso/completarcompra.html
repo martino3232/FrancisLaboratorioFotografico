@@ -217,7 +217,7 @@
 
   // 4) Función para llamar al endpoint HTTP y redirigir al checkout
   async function iniciarPago(total, paymentType) {
-    const url = "/createPreferenceHttp";
+    const url = "https://francislaboratoriofotografico.onrender.com/createPreferenceHttp";
     const resp = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
