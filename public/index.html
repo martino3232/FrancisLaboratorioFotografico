@@ -947,18 +947,10 @@
   <!-- Loader mientras llegan datos -->
   <div id="loader-all" class="loader"></div>
 
-  <!-- Carrusel de productos -->
-  <div class="products-carousel-container">
-    <button class="carousel-arrow left" id="all-left">
-      <i class="fas fa-chevron-left"></i>
-    </button>
-    <div class="products-carousel" id="products-carousel">
-      <!-- Aquí se inyectan hasta 10 cards al azar -->
+  <!-- Grilla de productos 2x2 -->
+    <div id="products-grid" class="products-grid visible">
+      <!-- Aquí se inyectan todos los productos -->
     </div>
-    <button class="carousel-arrow right" id="all-right">
-      <i class="fas fa-chevron-right"></i>
-    </button>
-  </div>
 </section>
 <style>
   /* Carrusel horizontal */
@@ -1003,6 +995,19 @@
 .carousel-arrow.right {
   right: 10px;
 }
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+@media (max-width: 768px) {
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 
 </style>
 <!-- ============================
@@ -1462,7 +1467,8 @@
     // ————————————————————————————————————————————————————————————
     async function cargarTodosProductos() {
       const loader = document.getElementById("loader-all");
-      const carousel = document.getElementById("products-carousel");
+      const carousel = document.getElementById("products-grid");
+
 
       try {
         // 1) traemos todos los docs
@@ -1479,13 +1485,11 @@
         selected.forEach(({ id, data }) => {
           const card = crearCardProducto(data, id);
           // opcional: forzar un ancho fijo para que quede uniforme
-          card.style.minWidth = "250px";
           carousel.appendChild(card);
         });
 
         // 5) ocultar loader
         loader.style.display = "none";
-        carousel.parentElement.style.opacity = 1;
 
       } catch (error) {
         console.error("Error cargando productos:", error);
@@ -1494,15 +1498,7 @@
       }
     }
 
-    // flechas para desplazar el carrusel
-    document.getElementById("all-left").addEventListener("click", () => {
-      const c = document.getElementById("products-carousel");
-      c.scrollBy({ left: -300, behavior: "smooth" });
-    });
-    document.getElementById("all-right").addEventListener("click", () => {
-      const c = document.getElementById("products-carousel");
-      c.scrollBy({ left: +300, behavior: "smooth" });
-    });
+    
 
     // Llamar a la función al cargar el DOM
     document.addEventListener("DOMContentLoaded", () => {
