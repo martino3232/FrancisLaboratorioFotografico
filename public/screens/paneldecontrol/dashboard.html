@@ -205,6 +205,14 @@
     .activity-feed .time {
       font-size:0.8rem; color:#999; margin-left:auto;
     }
+    .modal {
+      position: fixed; top:0; left:0; width:100%; height:100%;
+      background: rgba(0,0,0,0.5); display:flex; justify-content:center; align-items:center;
+    }
+    .modal-content {
+      background:#fff; padding:20px; border-radius:10px; width:300px;
+    }
+    .close { float:right; cursor:pointer; font-size:20px; }
   </style>
 </head>
 <body>
@@ -239,6 +247,9 @@
       <div class="quick-actions">
         <div class="action-btn" onclick="location.href='productos.html'">
           <i class="fas fa-plus-circle"></i><span>Agregar Producto</span>
+        </div>
+        <div class="action-btn" onclick="openCategoriaModal()">
+          <i class="fas fa-tags"></i><span>Agregar Categoría</span>
         </div>
         <div class="action-btn" onclick="location.href='clientes.html'">
           <i class="fas fa-user-plus"></i><span>Nuevo Cliente</span>
@@ -292,6 +303,15 @@
           <canvas id="chart-categories"></canvas>
         </div>
       </div>
+      <div id="modal-categoria" class="modal" style="display:none;">
+        <div class="modal-content">
+          <span class="close" onclick="closeCategoriaModal()">&times;</span>
+          <h2>Nueva Categoría</h2>
+          <input type="text" id="categoria-nombre" placeholder="Nombre de categoría"/>
+          <button onclick="guardarCategoria()">Guardar</button>
+        </div>
+      </div>
+
 
       <!-- Recent Orders -->
       <div class="recent-orders">
@@ -330,8 +350,8 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
   import {
-    getFirestore, collection, getDocs, getCountFromServer,
-    query, where, orderBy, limit
+    getFirestore, getDocs, getCountFromServer,
+    query, where, orderBy, limit, addDoc, collection 
   } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
   // Firebase config
@@ -356,6 +376,14 @@
       options:{ animation:false, scales:{x:{display:false},y:{display:false}}, plugins:{legend:{display:false}} }
     });
   }
+
+  // Funciones para abrir/cerrar modal
+    window.openCategoriaModal = function() {
+      document.getElementById("modal-categoria").style.display = "flex";
+    };
+    window.closeCategoriaModal = function() {
+      document.getElementById("modal-categoria").style.display = "none";
+    };
 
   async function loadDashboard() {
     // Metrics counts
@@ -385,6 +413,41 @@
       data:{ labels:salesLabels, datasets:[{ label:'Ventas', data:salesData, backgroundColor:'#3b82f6' }]},
       options:{ responsive:true }
     });
+
+    
+
+    // Guardar nueva categoría
+    window.guardarCategoria = async function() {
+      const nombre = document.getElementById("categoria-nombre").value.trim();
+      if (!nombre) {
+        alert("Por favor ingresa un nombre.");
+        return;
+      }
+
+      await addDoc(collection(db, "categorias"), { nombre });
+      alert("Categoría guardada!");
+      document.getElementById("categoria-nombre").value = "";
+      closeCategoriaModal();
+      await cargarCategorias(); // recargar lista de categorías
+    };
+
+    // Cargar categorías en select de productos
+    window.cargarCategorias = async function() {
+      const snap = await getDocs(collection(db, "categorias"));
+      const select = document.getElementById("producto-categoria");
+      if (!select) return;
+
+      select.innerHTML = ""; // limpiar
+      snap.forEach(doc => {
+        const opt = document.createElement("option");
+        opt.value = doc.data().nombre;
+        opt.textContent = doc.data().nombre;
+        select.appendChild(opt);
+      });
+    };
+
+// Llamar a cargarCategorias al iniciar
+document.addEventListener("DOMContentLoaded", cargarCategorias);
 
     // Category distribution
     const cats = ['Foto','Banner','Lona','Accesorios','Servicio'];

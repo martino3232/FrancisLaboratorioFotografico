@@ -261,7 +261,9 @@
     <div class="form-control"><label>Nombre</label><input id="prod-nombre"/></div>
     <div class="form-control"><label>Precio</label><input id="prod-precio" type="number"/></div>
     <div class="form-control"><label>Stock</label><input id="prod-stock" type="number"/></div>
-    <div class="form-control"><label>Categoría</label><select id="prod-categoria"></select></div>
+    <div class="form-control"><label>Categoría</label><select id="prod-categoria" name="categoria" class="form-control">
+  <option value="">Selecciona una categoría</option>
+</select></div>
     <div class="form-control"><label>URL Imagen</label><input id="prod-url"/></div>
     <button class="btn" onclick="saveProduct()">Guardar</button>
   </div>
@@ -275,9 +277,12 @@
     document.getElementById('product-modal').style.display='flex';
     document.getElementById('modal-title').textContent='Nuevo Producto';
     editId = null;
-    // limpiar campos
     ['prod-nombre','prod-precio','prod-stock','prod-url'].forEach(id=>document.getElementById(id).value='');
+
+    // cargar categorías cada vez que abro el modal
+    loadCategories();
   }
+
   function closeModal(e){
     if(e.target.id==='product-modal' || e.target.classList.contains('close')){
       document.getElementById('product-modal').style.display='none';
@@ -322,6 +327,30 @@
     renderTrendChart();
   });
 
+  // Referencia al select
+  const categoriaSelect = document.getElementById("categoria");
+
+  // Cargar categorías desde Firestore
+  async function cargarCategorias() {
+    try {
+      const querySnapshot = await getDocs(collection(db, "categorias"));
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const option = document.createElement("option");
+        option.value = data.nombre;
+        option.textContent = data.nombre;
+        categoriaSelect.appendChild(option);
+      });
+    } catch (error) {
+      console.error("Error cargando categorías:", error);
+    }
+  }
+
+  // Ejecutar al abrir el modal o cargar la página
+  cargarCategorias();
+
+  
+
   // — Estadísticas
   async function loadStats(){
     // 1) Traer todos los productos
@@ -356,16 +385,42 @@
   }
 
   // — Carga categorías en filtros y modal
-  async function loadCategories(){
-    const snap = await getDocs(prodCol);
-    allCategories = [...new Set(snap.docs.map(d=>d.data().categoria))];
-    const selF = document.getElementById('filter-cat'),
-          selM = document.getElementById('prod-categoria');
-    allCategories.forEach(c=>{
-      selF.innerHTML += `<option value="${c}">${c}</option>`;
-      selM.innerHTML += `<option value="${c}">${c}</option>`;
-    });
-  }
+  // — Carga categorías en filtros y modal
+async function loadCategories(){
+  const catSet = new Set();
+
+  // 1) Categorías de productos
+  const snapProds = await getDocs(prodCol);
+  snapProds.forEach(d => {
+    if (d.data().categoria) {
+      catSet.add(d.data().categoria);
+    }
+  });
+
+  // 2) Categorías de la colección 'categorias'
+  const snapCats = await getDocs(collection(db, "categorias"));
+  snapCats.forEach(d => {
+    const data = d.data();
+    if (data.nombre) {
+      catSet.add(data.nombre);
+    }
+  });
+
+  allCategories = Array.from(catSet);
+
+  const selF = document.getElementById('filter-cat');
+  const selM = document.getElementById('prod-categoria');
+
+  // limpiar opciones antes de volver a agregar
+  selF.innerHTML = '<option value="">Todas las categorías</option>';
+  selM.innerHTML = '<option value="">Selecciona una categoría</option>';
+
+  allCategories.forEach(c=>{
+    selF.innerHTML += `<option value="${c}">${c}</option>`;
+    selM.innerHTML += `<option value="${c}">${c}</option>`;
+  });
+}
+
 
   // — Gráfico de categorías
   async function renderCatsChart(){
